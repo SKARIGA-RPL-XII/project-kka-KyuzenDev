@@ -1,4 +1,4 @@
-import { db } from "@/src/lib/db";
+import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
@@ -7,7 +7,7 @@ interface RegisterInput {
   nama: string;
   email: string;
   password: string;
-  role: "PASIEN" | "APOTEKER";
+  role: "Pasien" | "Apoteker";
 }
 
 interface LoginInput {

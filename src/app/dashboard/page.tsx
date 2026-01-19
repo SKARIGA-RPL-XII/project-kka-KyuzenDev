@@ -21,7 +21,7 @@ export default function DashboardPage() {
     const storedData = localStorage.getItem("user");
 
     if (!storedData) {
-      router.push("/login");
+      router.push("/auth/login");
       return;
     }
 
@@ -37,7 +37,7 @@ export default function DashboardPage() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   if (!mounted || !user) {

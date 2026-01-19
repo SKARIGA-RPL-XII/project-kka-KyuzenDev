@@ -32,7 +32,7 @@ export default function RegisterPage() {
       if (!res.ok) throw new Error(data.error || "Terjadi kesalahan");
 
       alert("Registrasi Berhasil! Silakan Login.");
-      router.push("/login");
+      router.push("/auth/login");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -124,7 +124,7 @@ export default function RegisterPage() {
           <p className="text-sm text-gray-600">
             Sudah punya akun?{" "}
             <Link
-              href="/login"
+              href="/auth/login"
               className="text-blue-600 font-semibold hover:underline"
             >
               Masuk di sini
