@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { db } from "@/src/lib/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
@@ -7,7 +7,7 @@ interface RegisterInput {
   nama: string;
   email: string;
   password: string;
-    role: "PASIEN" | "APOTEKER";
+  role: "PASIEN" | "APOTEKER";
 }
 
 interface LoginInput {
@@ -21,7 +21,7 @@ export class AuthService {
 
     const [rows] = await db.execute<RowDataPacket[]>(
       "SELECT id FROM User WHERE email = ?",
-      [email]
+      [email],
     );
 
     if (rows.length > 0) {
@@ -32,7 +32,7 @@ export class AuthService {
 
     const [result] = await db.execute<ResultSetHeader>(
       "INSERT INTO User (nama, email, password, role) VALUES (?, ?, ?, ?)",
-      [nama, email, hashedPassword, role]
+      [nama, email, hashedPassword, role],
     );
 
     return {
@@ -45,7 +45,7 @@ export class AuthService {
 
   static async getAllUsers() {
     const [rows] = await db.execute<RowDataPacket[]>(
-      "SELECT id, nama, email, role, createdAt FROM User ORDER BY createdAt DESC"
+      "SELECT id, nama, email, role, createdAt FROM User ORDER BY createdAt DESC",
     );
     return rows;
   }
@@ -55,7 +55,7 @@ export class AuthService {
 
     const [rows] = await db.execute<RowDataPacket[]>(
       "SELECT * FROM User WHERE email = ?",
-      [email]
+      [email],
     );
 
     const user = rows[0];
@@ -67,7 +67,7 @@ export class AuthService {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET as string,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
 
     return {
