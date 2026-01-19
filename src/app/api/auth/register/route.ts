@@ -1,4 +1,4 @@
-import { AuthService } from "@/services/AuthService";
+import { AuthService } from "@/src/services/AuthService";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -7,10 +7,11 @@ export async function POST(req: Request) {
     const user = await AuthService.register(body);
     return NextResponse.json(
       { message: "Registrasi Berhasil", user },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "An error occurred";
+    const message =
+      error instanceof Error ? error.message : "An error occurred";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

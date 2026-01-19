@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { db } from "@/src/lib/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { ResultSetHeader, RowDataPacket } from "mysql2";

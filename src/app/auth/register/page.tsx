@@ -4,36 +4,40 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginPage() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+export default function RegisterPage() {
+  const [formData, setFormData] = useState({
+    nama: "",
+    email: "",
+    password: "",
+    role: "Pasien",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Login gagal");
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      if (!res.ok) throw new Error(data.error || "Terjadi kesalahan");
 
-      router.push("/dashboard");
+      alert("Registrasi Berhasil! Silakan Login.");
+      router.push("/auth/login");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Terjadi kesalahan sistem");
+        setError("Terjadi kesalahan yang tidak diketahui");
       }
     } finally {
       setLoading(false);
@@ -46,9 +50,7 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold mb-6 text-center text-blue-600">
           SmartPharmacy
         </h1>
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          Selamat Datang Kembali
-        </h2>
+        <h2 className="text-xl font-semibold mb-4">Buat Akun Baru</h2>
 
         {error && (
           <p className="text-red-500 bg-red-50 p-2 rounded mb-4 text-sm">
@@ -56,7 +58,19 @@ export default function LoginPage() {
           </p>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium">Nama Lengkap</label>
+            <input
+              type="text"
+              required
+              className="w-full p-2 border rounded mt-1 outline-blue-500"
+              onChange={(e) =>
+                setFormData({ ...formData, nama: e.target.value })
+              }
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium">Email</label>
             <input
@@ -81,6 +95,20 @@ export default function LoginPage() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium">Daftar Sebagai</label>
+            <select
+              className="w-full p-2 border rounded mt-1 bg-white"
+              value={formData.role}
+              onChange={(e) =>
+                setFormData({ ...formData, role: e.target.value })
+              }
+            >
+              <option value="Pasien">Pasien</option>
+              <option value="Apoteker">Apoteker</option>
+            </select>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -88,18 +116,18 @@ export default function LoginPage() {
               loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
             } transition`}
           >
-            {loading ? "Menghubungkan..." : "Masuk"}
+            {loading ? "Memproses..." : "Daftar Sekarang"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Belum memiliki akun?{" "}
+            Sudah punya akun?{" "}
             <Link
-              href="/register"
+              href="/auth/login"
               className="text-blue-600 font-semibold hover:underline"
             >
-              Daftar di sini
+              Masuk di sini
             </Link>
           </p>
         </div>
