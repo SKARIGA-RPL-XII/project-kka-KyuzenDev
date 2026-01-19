@@ -2,18 +2,21 @@ import { db } from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
 export const getAdminStats = async () => {
-  const [rows] = await db.query<RowDataPacket[]>(
-    "SELECT COUNT(*) as total FROM users",
+  const [pasien] = await db.query<RowDataPacket[]>(
+    "SELECT COUNT(*) as total FROM user WHERE role = 'Pasien'",
+  );
+  const [apoteker] = await db.query<RowDataPacket[]>(
+    "SELECT COUNT(*) as total FROM user WHERE role = 'Apoteker'",
   );
 
   return {
-    totalUsers: rows[0]?.total || 0,
+    totalPasien: pasien[0]?.total || 0,
+    totalApoteker: apoteker[0]?.total || 0,
   };
 };
-
 export const getAllUsers = async () => {
   const [rows] = await db.query<RowDataPacket[]>(
-    "SELECT id, nama, email, role FROM users ORDER BY created_at DESC",
+    "SELECT id, nama, email, role FROM user ORDER BY createdAt DESC",
   );
   return rows;
 };

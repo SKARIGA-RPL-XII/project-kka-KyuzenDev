@@ -43,13 +43,6 @@ export class AuthService {
     };
   }
 
-  static async getAllUsers() {
-    const [rows] = await db.execute<RowDataPacket[]>(
-      "SELECT id, nama, email, role, createdAt FROM User ORDER BY createdAt DESC",
-    );
-    return rows;
-  }
-
   static async login(data: LoginInput) {
     const { email, password } = data;
 
