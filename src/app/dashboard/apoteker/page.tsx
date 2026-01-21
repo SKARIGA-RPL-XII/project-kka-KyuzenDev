@@ -1,11 +1,25 @@
+"use client";
 import {
   LuPackage,
   LuClipboardList,
   LuUser,
   LuChevronRight,
 } from "react-icons/lu";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ApotekerPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (user.role !== "Apoteker") {
+      if (user.role === "Admin") router.replace("/dashboard/admin");
+      else if (user.role === "Pasien") router.replace("/dashboard/pasien");
+      else router.push("/auth/login");
+    }
+  }, [router]);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-emerald-100 hover:border-emerald-400 hover:shadow-md transition-all group">

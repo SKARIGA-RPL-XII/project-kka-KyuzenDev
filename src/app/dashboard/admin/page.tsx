@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect, useCallback } from "react";
 import { UserRow } from "@/types/user";
 import {
@@ -12,6 +11,7 @@ import {
   LuShieldCheck,
   LuStethoscope,
 } from "react-icons/lu";
+import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
   const [view, setView] = useState<"menu" | "panel" | "users">("menu");
@@ -43,6 +43,22 @@ export default function AdminPage() {
     fetchData();
   }, [fetchData]);
 
+const router = useRouter();
+
+useEffect(() => {
+  const storedData = localStorage.getItem("user");
+  if (!storedData) {
+    router.push("/auth/login");
+    return;
+  }
+
+  const user = JSON.parse(storedData);
+  if (user.role !== "Admin") {
+    if (user.role === "Apoteker") router.replace("/dashboard/apoteker");
+    else if (user.role === "Pasien") router.replace("/dashboard/pasien");
+  }
+}, [router]);
+  
   const handleDelete = async (id: number) => {
     if (confirm("Apakah Anda yakin ingin menghapus user ini?")) {
       try {
