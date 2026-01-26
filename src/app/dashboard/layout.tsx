@@ -84,13 +84,6 @@ export default function DashboardLayout({
 
   const isProfilePage = pathname.includes("/profil");
 
-  const initials = user.nama
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
@@ -118,7 +111,12 @@ export default function DashboardLayout({
                     unoptimized
                   />
                 ) : (
-                  initials
+                  <Image
+                    src="/dummy_user.png"
+                    alt="Default Profile"
+                    fill
+                    className="object-cover"
+                  />
                 )}
               </div>
               <div className="hidden md:block text-left">

@@ -57,6 +57,16 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new Error("Email atau password salah");
 
+    let imageBase64 = null;
+
+    if (user.photo_profile && Buffer.isBuffer(user.photo_profile)) {
+      imageBase64 = `data:image/jpeg;base64,${user.photo_profile.toString("base64")}`;
+    } else if (typeof user.photo_profile === "string") {
+      imageBase64 = user.photo_profile.startsWith("data:")
+        ? user.photo_profile
+        : `data:image/jpeg;base64,${user.photo_profile}`;
+    }
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET as string,
@@ -69,8 +79,7 @@ export class AuthService {
         id: user.id,
         nama: user.nama,
         role: user.role,
-        // TAMBAHKAN BARIS INI:
-        photo_profile: user.photo_profile,
+        photo_profile: imageBase64,
       },
     };
   }
