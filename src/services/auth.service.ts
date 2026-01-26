@@ -69,6 +69,8 @@ export class AuthService {
         id: user.id,
         nama: user.nama,
         role: user.role,
+        // TAMBAHKAN BARIS INI:
+        photo_profile: user.photo_profile,
       },
     };
   }
