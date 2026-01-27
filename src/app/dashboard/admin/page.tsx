@@ -60,14 +60,36 @@ export default function AdminPage() {
   }, [router]);
 
   const handleDelete = async (id: number) => {
-    if (confirm("Apakah Anda yakin ingin menghapus user ini?")) {
+    const storedData = localStorage.getItem("user");
+    const currentUser = storedData ? JSON.parse(storedData) : null;
+
+    if (currentUser && currentUser.id === id) {
+      alert(
+        "Bahaya! Anda tidak dapat menghapus akun Anda sendiri yang sedang digunakan.",
+      );
+      return;
+    }
+
+    if (
+      confirm(
+        "Apakah Anda yakin ingin menghapus user ini? Data yang dihapus tidak dapat dikembalikan.",
+      )
+    ) {
       try {
         const response = await fetch(`/api/admin/users/${id}`, {
           method: "DELETE",
         });
-        if (response.ok) fetchData();
+
+        if (response.ok) {
+          fetchData();
+          alert("User berhasil dihapus.");
+        } else {
+          const errorData = await response.json();
+          alert(errorData.error || "Gagal menghapus user.");
+        }
       } catch (error) {
         console.error("Gagal menghapus:", error);
+        alert("Terjadi kesalahan koneksi saat mencoba menghapus user.");
       }
     }
   };
