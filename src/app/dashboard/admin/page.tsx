@@ -21,6 +21,23 @@ export default function AdminPage() {
     totalApoteker: 0,
   });
   const [users, setUsers] = useState<UserRow[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const filteredUsers = users.filter((user) => {
+    const matchesName = user.nama
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === "All" || user.role === roleFilter;
+    return matchesName && matchesRole;
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -41,7 +58,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    setCurrentPage(1);
+  }, [fetchData, searchTerm, roleFilter]);
 
   const router = useRouter();
 
@@ -247,36 +265,45 @@ export default function AdminPage() {
 
       {view === "users" && (
         <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden animate-in slide-in-from-right duration-500">
-          <div className="p-5 border-b bg-gray-50 flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <LuUsers className="text-blue-600" size={24} />
-              <h3 className="font-bold text-lg text-gray-800">
-                Daftar Pengguna Aktif
-              </h3>
+          <div className="p-5 border-b bg-gray-50 space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <LuUsers className="text-blue-600" size={24} />
+                <h3 className="font-bold text-lg text-gray-800">
+                  Daftar Pengguna
+                </h3>
+              </div>
+              <span className="text-xs font-mono bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-100">
+                Total: {filteredUsers.length}
+              </span>
             </div>
-            <span className="text-xs font-mono bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-100">
-              Total: {users.length}
-            </span>
+
+            <div className="flex flex-col md:flex-row gap-3">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="flex-1 p-2 text-sm border rounded-lg outline-blue-500 focus:placeholder-gray-300 placeholder-gray-500 text-gray-900"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <select
+                className="p-2 text-sm border rounded-lg outline-blue-500 bg-white text-black"
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+              >
+                <option value="All">Semua Role</option>
+                <option value="Admin">Admin</option>
+                <option value="Apoteker">Apoteker</option>
+                <option value="Pasien">Pasien</option>
+              </select>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Nama
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Aksi
-                  </th>
-                </tr>
-              </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {users.length > 0 ? (
-                  users.map((user) => (
+                {currentItems.length > 0 ? (
+                  currentItems.map((user) => (
                     <tr
                       key={user.id}
                       className="hover:bg-blue-50/30 transition-colors group"
@@ -326,13 +353,35 @@ export default function AdminPage() {
                       colSpan={3}
                       className="px-6 py-10 text-center text-gray-400 italic"
                     >
-                      Tidak ada data pengguna.
+                      Data tidak ditemukan.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+
+          {totalPages > 1 && (
+            <div className="p-4 border-t bg-gray-50 flex justify-center items-center gap-4">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+                className="px-3 py-1 border rounded text-black cursor-pointer bg-white hover:bg-gray-100 disabled:opacity-50 transition-all text-sm"
+              >
+                Prev
+              </button>
+              <span className="text-sm text-black font-medium">
+                Halaman {currentPage} dari {totalPages}
+              </span>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+                className="px-3 py-1 border text-black cursor-pointer rounded bg-white hover:bg-gray-100 disabled:opacity-50 transition-all text-sm"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
