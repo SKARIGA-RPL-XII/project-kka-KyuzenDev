@@ -95,20 +95,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium">Daftar Sebagai</label>
-            <select
-              className="w-full p-2 border rounded mt-1 bg-white"
-              value={formData.role}
-              onChange={(e) =>
-                setFormData({ ...formData, role: e.target.value })
-              }
-            >
-              <option value="Pasien">Pasien</option>
-              <option value="Apoteker">Apoteker</option>
-            </select>
-          </div>
-
           <button
             type="submit"
             disabled={loading}

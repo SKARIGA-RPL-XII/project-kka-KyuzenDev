@@ -43,22 +43,22 @@ export default function AdminPage() {
     fetchData();
   }, [fetchData]);
 
-const router = useRouter();
+  const router = useRouter();
 
-useEffect(() => {
-  const storedData = localStorage.getItem("user");
-  if (!storedData) {
-    router.push("/auth/login");
-    return;
-  }
+  useEffect(() => {
+    const storedData = localStorage.getItem("user");
+    if (!storedData) {
+      router.push("/auth/login");
+      return;
+    }
 
-  const user = JSON.parse(storedData);
-  if (user.role !== "Admin") {
-    if (user.role === "Apoteker") router.replace("/dashboard/apoteker");
-    else if (user.role === "Pasien") router.replace("/dashboard/pasien");
-  }
-}, [router]);
-  
+    const user = JSON.parse(storedData);
+    if (user.role !== "Admin") {
+      if (user.role === "Apoteker") router.replace("/dashboard/apoteker");
+      else if (user.role === "Pasien") router.replace("/dashboard/pasien");
+    }
+  }, [router]);
+
   const handleDelete = async (id: number) => {
     if (confirm("Apakah Anda yakin ingin menghapus user ini?")) {
       try {
@@ -72,6 +72,44 @@ useEffect(() => {
     }
   };
 
+  const handleRoleChange = async (
+    userId: number,
+    newRole: string,
+    currentRole: string,
+  ) => {
+    if (newRole === currentRole) return;
+
+    const storedData = localStorage.getItem("user");
+    const currentUser = storedData ? JSON.parse(storedData) : null;
+
+    if (currentUser && currentUser.id === userId && newRole !== "Admin") {
+      alert("Anda tidak dapat mengubah role akun Anda sendiri.");
+      return;
+    }
+
+    if (newRole === "Admin") {
+      const yakin = confirm(
+        `Peringatan: Anda akan mengubah role user ini menjadi Admin. Lanjutkan?`,
+      );
+      if (!yakin) return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/users/${userId}/role`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: newRole }),
+      });
+
+      if (response.ok) {
+        fetchData();
+      } else {
+        alert("Gagal memperbarui role");
+      }
+    } catch (error) {
+      console.error("Error updating role:", error);
+    }
+  };
   if (loading && view === "menu") {
     return (
       <div className="flex flex-col items-center justify-center p-20 space-y-4">
@@ -232,17 +270,23 @@ useEffect(() => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider ${
+                        <select
+                          value={user.role}
+                          onChange={(e) =>
+                            handleRoleChange(user.id, e.target.value, user.role)
+                          }
+                          className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider border cursor-pointer outline-none appearance-none text-center transition-all ${
                             user.role === "Admin"
-                              ? "bg-red-100 text-red-700 border border-red-200"
+                              ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
                               : user.role === "Apoteker"
-                                ? "bg-green-100 text-green-700 border border-green-200"
-                                : "bg-blue-100 text-blue-700 border border-blue-200"
+                                ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
+                                : "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
                           }`}
                         >
-                          {user.role}
-                        </span>
+                          <option value="Pasien">Pasien</option>
+                          <option value="Apoteker">Apoteker</option>
+                          <option value="Admin">Admin</option>
+                        </select>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <button
