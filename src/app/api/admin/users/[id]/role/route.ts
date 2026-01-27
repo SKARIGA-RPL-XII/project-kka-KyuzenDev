@@ -8,7 +8,6 @@ export async function PATCH(
   try {
     const { role } = await request.json();
 
-    // UNWRAP PARAMS DI SINI:
     const { id } = await params;
 
     await db.query("UPDATE user SET role = ? WHERE id = ?", [role, id]);
