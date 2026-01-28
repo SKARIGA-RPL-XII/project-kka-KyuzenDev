@@ -1,94 +1,19 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEditProfile } from "@/hooks/useEditProfile";
 import Image from "next/image";
 import { LuCamera, LuSave } from "react-icons/lu";
 
-interface User {
-  id: number;
-  nama: string;
-  email: string;
-  role: string;
-  photo_profile?: string;
-}
-
 export default function EditProfilPage() {
-  const router = useRouter();
-
-  const [user] = useState<User | null>(() => {
-    if (typeof window !== "undefined") {
-      const storedData = localStorage.getItem("user");
-      return storedData ? JSON.parse(storedData) : null;
-    }
-    return null;
-  });
-
-  const [formData, setFormData] = useState({
-    nama: user?.nama || "",
-    email: user?.email || "",
-    password: "",
-  });
-
-  const [previewImage, setPreviewImage] = useState<string | null>(
-    user?.photo_profile || null,
-  );
-
-  useEffect(() => {
-    if (!user) {
-      router.push("/auth/login");
-    }
-  }, [user, router]);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleCancel = () => {
-    if (user?.role === "Admin") router.push("/dashboard/admin");
-    else if (user?.role === "Apoteker") router.push("/dashboard/apoteker");
-    else router.push("/dashboard/pasien");
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch("/api/user/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: user?.id,
-          nama: formData.nama,
-          email: formData.email,
-          photo_profile: previewImage,
-        }),
-      });
-
-      if (response.ok) {
-        const updatedUser = {
-          ...user,
-          nama: formData.nama,
-          photo_profile: previewImage,
-        };
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        window.dispatchEvent(new Event("storage"));
-
-        alert("Profil berhasil diperbarui!");
-        router.push("/dashboard");
-      }
-    } catch (error) {
-      console.error("Gagal menyimpan:", error);
-      alert("Terjadi kesalahan koneksi.");
-    }
-  };
+  const {
+    user,
+    formData,
+    setFormData,
+    previewImage,
+    handleImageChange,
+    handleCancel,
+    handleSave,
+    loading,
+  } = useEditProfile();
 
   if (!user) return null;
 
@@ -178,14 +103,31 @@ export default function EditProfilPage() {
         <div className="flex flex-col gap-4 pt-6">
           <button
             type="submit"
-            className="flex-1 p-3 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            disabled={loading}
+            className={`flex-1 p-3 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
+            }`}
           >
-            <LuSave size={20} /> Simpan
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Menyimpan...</span>
+              </>
+            ) : (
+              <>
+                <LuSave size={20} />
+                <span>Simpan</span>
+              </>
+            )}
           </button>
+
           <button
             type="button"
+            disabled={loading}
             onClick={handleCancel}
-            className="flex-1 p-3 rounded-xl bg-gray-200 font-bold text-gray-600 hover:bg-gray-300 transition-all border border-gray-100 cursor-pointer"
+            className="flex-1 p-3 rounded-xl bg-gray-200 font-bold text-gray-600 hover:bg-gray-300 transition-all border border-gray-100 cursor-pointer disabled:opacity-50"
           >
             Batal
           </button>
