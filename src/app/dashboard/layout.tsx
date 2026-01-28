@@ -1,75 +1,24 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useRouter, usePathname } from "next/navigation";
 import { LuLogOut, LuChevronDown } from "react-icons/lu";
 import Image from "next/image";
-
-interface User {
-  id: number;
-  nama: string;
-  role: "Pasien" | "Apoteker" | "Admin";
-  photo_profile?: string;
-}
+import { useDashboard } from "@/hooks/useDashboard";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const [user, setUser] = useState<User | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const storedData = localStorage.getItem("user");
-      if (storedData) {
-        try {
-          const parsedUser = JSON.parse(storedData);
-          setUser(parsedUser);
-        } catch (error) {
-          console.error("Failed to parse user data", error);
-          router.push("/auth/login");
-        }
-      } else {
-        router.push("/auth/login");
-      }
-    };
-
-    handleStorageChange();
-
-    window.addEventListener("storage", handleStorageChange);
-
-    const mountTimer = setTimeout(() => {
-      setIsMounted(true);
-    }, 0);
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      document.removeEventListener("mousedown", handleClickOutside);
-      clearTimeout(mountTimer);
-    };
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.clear();
-    router.push("/auth/login");
-  };
+  const {
+    user,
+    isMounted,
+    isMenuOpen,
+    setIsMenuOpen,
+    dropdownRef,
+    handleLogout,
+    isProfilePage,
+    router,
+  } = useDashboard();
 
   if (!isMounted || !user) {
     return (
@@ -81,8 +30,6 @@ export default function DashboardLayout({
       </div>
     );
   }
-
-  const isProfilePage = pathname.includes("/profil");
 
   return (
     <div className="min-h-screen bg-gray-50">
