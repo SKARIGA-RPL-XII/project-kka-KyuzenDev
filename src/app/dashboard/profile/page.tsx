@@ -61,7 +61,7 @@ export default function EditProfilPage() {
             </label>
             <input
               type="text"
-              value={formData.nama}
+              value={formData.nama || ""}
               onChange={(e) =>
                 setFormData({ ...formData, nama: e.target.value })
               }
@@ -76,7 +76,7 @@ export default function EditProfilPage() {
             </label>
             <input
               type="email"
-              value={formData.email}
+              value={formData.email || ""}
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
@@ -91,6 +91,7 @@ export default function EditProfilPage() {
             </label>
             <input
               type="password"
+              value={formData.password || ""}
               placeholder="Kosongkan jika tidak ingin mengubah"
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
