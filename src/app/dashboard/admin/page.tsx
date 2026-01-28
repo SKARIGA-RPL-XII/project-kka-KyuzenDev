@@ -1,6 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { UserRow } from "@/types/user";
+import { useAdmin } from "@/hooks/useAdmin";
 import {
   LuLayoutDashboard,
   LuUsers,
@@ -11,145 +10,26 @@ import {
   LuShieldCheck,
   LuStethoscope,
 } from "react-icons/lu";
-import { useRouter } from "next/navigation";
 
 export default function AdminPage() {
-  const [view, setView] = useState<"menu" | "panel" | "users">("menu");
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalPasien: 0,
-    totalApoteker: 0,
-  });
-  const [users, setUsers] = useState<UserRow[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const {
+    view,
+    setView,
+    loading,
+    stats,
+    currentItems,
+    searchTerm,
+    setSearchTerm,
+    roleFilter,
+    setRoleFilter,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    handleDelete,
+    handleRoleChange,
+    filteredUsersCount,
+  } = useAdmin();
 
-  const filteredUsers = users.filter((user) => {
-    const matchesName = user.nama
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === "All" || user.role === roleFilter;
-    return matchesName && matchesRole;
-  });
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/admin/stats");
-      const data = await response.json();
-
-      if (data.error) throw new Error(data.error);
-
-      setStats(data.stats);
-      setUsers(data.users as UserRow[]);
-    } catch (error) {
-      console.error("Gagal memuat data:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-    setCurrentPage(1);
-  }, [fetchData, searchTerm, roleFilter]);
-
-  const router = useRouter();
-
-  useEffect(() => {
-    const storedData = localStorage.getItem("user");
-    if (!storedData) {
-      router.push("/auth/login");
-      return;
-    }
-
-    const user = JSON.parse(storedData);
-    if (user.role !== "Admin") {
-      if (user.role === "Apoteker") router.replace("/dashboard/apoteker");
-      else if (user.role === "Pasien") router.replace("/dashboard/pasien");
-    }
-  }, [router]);
-
-  const handleDelete = async (id: number) => {
-    const storedData = localStorage.getItem("user");
-    const currentUser = storedData ? JSON.parse(storedData) : null;
-
-    if (currentUser && currentUser.id === id) {
-      alert(
-        "Bahaya! Anda tidak dapat menghapus akun Anda sendiri yang sedang digunakan.",
-      );
-      return;
-    }
-
-    if (
-      confirm(
-        "Apakah Anda yakin ingin menghapus user ini? Data yang dihapus tidak dapat dikembalikan.",
-      )
-    ) {
-      try {
-        const response = await fetch(`/api/admin/users/${id}`, {
-          method: "DELETE",
-        });
-
-        if (response.ok) {
-          fetchData();
-          alert("User berhasil dihapus.");
-        } else {
-          const errorData = await response.json();
-          alert(errorData.error || "Gagal menghapus user.");
-        }
-      } catch (error) {
-        console.error("Gagal menghapus:", error);
-        alert("Terjadi kesalahan koneksi saat mencoba menghapus user.");
-      }
-    }
-  };
-
-  const handleRoleChange = async (
-    userId: number,
-    newRole: string,
-    currentRole: string,
-  ) => {
-    if (newRole === currentRole) return;
-
-    const storedData = localStorage.getItem("user");
-    const currentUser = storedData ? JSON.parse(storedData) : null;
-
-    if (currentUser && currentUser.id === userId && newRole !== "Admin") {
-      alert("Anda tidak dapat mengubah role akun Anda sendiri.");
-      return;
-    }
-
-    if (newRole === "Admin") {
-      const yakin = confirm(
-        `Peringatan: Anda akan mengubah role user ini menjadi Admin. Lanjutkan?`,
-      );
-      if (!yakin) return;
-    }
-
-    try {
-      const response = await fetch(`/api/admin/users/${userId}/role`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: newRole }),
-      });
-
-      if (response.ok) {
-        fetchData();
-      } else {
-        alert("Gagal memperbarui role");
-      }
-    } catch (error) {
-      console.error("Error updating role:", error);
-    }
-  };
   if (loading && view === "menu") {
     return (
       <div className="flex flex-col items-center justify-center p-20 space-y-4">
@@ -274,7 +154,7 @@ export default function AdminPage() {
                 </h3>
               </div>
               <span className="text-xs font-mono bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-100">
-                Total: {filteredUsers.length}
+                Total: {filteredUsersCount}
               </span>
             </div>
 
