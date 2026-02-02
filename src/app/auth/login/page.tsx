@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LuEye, LuEyeOff } from "react-icons/lu";
 import Link from "next/link";
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -62,23 +64,35 @@ export default function LoginPage() {
             <input
               type="email"
               required
-              className="w-full p-2 border rounded mt-1 outline-blue-500"
+              className="w-full p-2 pr-10 border rounded mt-1 outline-blue-500 transition-all border-gray-300 focus:border-blue-500"
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium">Password</label>
-            <input
-              type="password"
-              required
-              className="w-full p-2 border rounded mt-1 outline-blue-500"
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-            />
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <div className="relative group">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={formData.password}
+                className="w-full p-2 pr-10 border rounded mt-1 outline-blue-500 transition-all border-gray-300 focus:border-blue-500"
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-[55%] -translate-y-1/2 p-1.5 cursor-pointer text-gray-400 hover:text-blue-600 transition-colors"
+              >
+                {showPassword ? <LuEyeOff size={18} /> : <LuEye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button
