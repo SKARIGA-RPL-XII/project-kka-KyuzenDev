@@ -10,6 +10,7 @@ import {
   LuShieldCheck,
   LuStethoscope,
 } from "react-icons/lu";
+import Image from "next/image";
 
 export default function AdminPage() {
   const {
@@ -190,14 +191,33 @@ export default function AdminPage() {
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                            <LuUser size={20} />
+                          <div className="w-10 h-10 rounded-full overflow-hidden relative border bg-gray-100 flex-shrink-0">
+                            <Image
+                              src={
+                                user.photo_profile &&
+                                user.photo_profile.startsWith("data:image")
+                                  ? user.photo_profile
+                                  : "/dummy_user.png"
+                              }
+                              alt={user.nama}
+                              fill
+                              sizes="2.5rem"
+                              className="object-cover"
+                              unoptimized
+                              priority
+                            />
                           </div>
-                          <span className="text-sm font-medium text-gray-900">
-                            {user.nama}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-gray-900 leading-none">
+                              {user.nama}
+                            </span>
+                            <span className="text-xs text-gray-500 mt-1">
+                              {user.email}
+                            </span>
+                          </div>
                         </div>
                       </td>
+
                       <td className="px-6 py-4 whitespace-nowrap">
                         <select
                           value={user.role}
@@ -217,6 +237,7 @@ export default function AdminPage() {
                           <option value="Admin">Admin</option>
                         </select>
                       </td>
+
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <button
                           onClick={() => handleDelete(user.id)}

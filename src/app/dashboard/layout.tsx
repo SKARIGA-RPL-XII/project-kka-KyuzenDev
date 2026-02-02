@@ -49,22 +49,20 @@ export default function DashboardLayout({
               className="flex items-center gap-3 p-1.5 rounded-full hover:bg-gray-100 transition-all cursor-pointer"
             >
               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-sm overflow-hidden relative">
-                {user.photo_profile ? (
-                  <Image
-                    src={user.photo_profile}
-                    alt="Profile"
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <Image
-                    src="/dummy_user.png"
-                    alt="Default Profile"
-                    fill
-                    className="object-cover"
-                  />
-                )}
+                <Image
+                  src={
+                    user.photo_profile &&
+                    user.photo_profile.startsWith("data:image")
+                      ? user.photo_profile
+                      : "/dummy_user.png"
+                  }
+                  alt={user.nama}
+                  fill
+                  sizes="2.5rem"
+                  className="object-cover"
+                  unoptimized
+                  priority
+                />
               </div>
               <div className="hidden md:block text-left">
                 <p className="text-sm font-semibold text-gray-800 leading-none">

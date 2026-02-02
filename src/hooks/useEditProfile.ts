@@ -37,14 +37,30 @@ export function useEditProfile() {
     }
   }, [router]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setPreviewImage(reader.result as string);
-      reader.readAsDataURL(file);
-    }
-  };
+ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   const file = e.target.files?.[0];
+   if (file) {
+     const reader = new FileReader();
+     reader.onload = (event) => {
+       const img = new Image();
+       img.src = event.target?.result as string;
+       img.onload = () => {
+         const canvas = document.createElement("canvas");
+         const MAX_WIDTH = 200;
+         const scaleSize = MAX_WIDTH / img.width;
+         canvas.width = MAX_WIDTH;
+         canvas.height = img.height * scaleSize;
+
+         const ctx = canvas.getContext("2d");
+         ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+         const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+         setPreviewImage(compressedBase64);
+       };
+     };
+     reader.readAsDataURL(file);
+   }
+ };
 
   const handleCancel = () => {
     if (!user) return;
@@ -67,7 +83,6 @@ export function useEditProfile() {
           id: user?.id,
           nama: formData.nama,
           email: formData.email,
-          password: formData.password || undefined, // Kirim password jika diisi
           photo_profile: previewImage,
         }),
       });
@@ -76,16 +91,25 @@ export function useEditProfile() {
         const updatedUser = {
           ...user,
           nama: formData.nama,
+          email: formData.email,
           photo_profile: previewImage,
         };
         localStorage.setItem("user", JSON.stringify(updatedUser));
+        const allUsersData = localStorage.getItem("users");
+        if (allUsersData) {
+          const allUsers = JSON.parse(allUsersData);
+          const updatedUsersList = allUsers.map((u: User) =>
+            u.id === user?.id ? { ...u, ...updatedUser } : u,
+          );
+          localStorage.setItem("users", JSON.stringify(updatedUsersList));
+        }
+
         window.dispatchEvent(new Event("storage"));
-        alert("Profil berhasil diperbarui!");
-        router.push("/dashboard");
+        alert("Profil dan Tabel Admin Berhasil Diperbarui!");
+        router.refresh(); // Segarkan data
       }
     } catch (error) {
-      console.error("Gagal menyimpan:", error);
-      alert("Terjadi kesalahan koneksi.");
+      console.error(error);
     } finally {
       setLoading(false);
     }
