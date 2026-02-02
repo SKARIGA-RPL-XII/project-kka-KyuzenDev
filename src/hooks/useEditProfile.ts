@@ -20,7 +20,8 @@ export function useEditProfile() {
     password: "",
   });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-
+  const [showPassword, setShowPassword] = useState(false);
+  
   useEffect(() => {
     const storedData = localStorage.getItem("user");
     if (!storedData) {
@@ -105,8 +106,8 @@ export function useEditProfile() {
         }
 
         window.dispatchEvent(new Event("storage"));
-        alert("Profil dan Tabel Admin Berhasil Diperbarui!");
-        router.refresh(); // Segarkan data
+        alert("Profil Berhasil Diperbarui!");
+        router.refresh();
       }
     } catch (error) {
       console.error(error);
@@ -124,5 +125,7 @@ export function useEditProfile() {
     handleCancel,
     handleSave,
     loading,
+    showPassword,
+    setShowPassword,
   };
 }

@@ -1,8 +1,7 @@
 "use client";
 import { useEditProfile } from "@/hooks/useEditProfile";
 import Image from "next/image";
-import { LuCamera, LuSave } from "react-icons/lu";
-
+import { LuCamera, LuSave, LuEye, LuEyeOff } from "react-icons/lu";
 export default function EditProfilPage() {
   const {
     user,
@@ -13,6 +12,8 @@ export default function EditProfilPage() {
     handleCancel,
     handleSave,
     loading,
+    showPassword,
+    setShowPassword,
   } = useEditProfile();
 
   if (!user) return null;
@@ -65,7 +66,7 @@ export default function EditProfilPage() {
               onChange={(e) =>
                 setFormData({ ...formData, nama: e.target.value })
               }
-              className="w-full p-3 text-gray-400 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full p-3 rounded-xl text-gray-600 border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               required
             />
           </div>
@@ -80,24 +81,36 @@ export default function EditProfilPage() {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full p-3 rounded-xl text-gray-600 border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               required
             />
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password Baru (Opsional)
             </label>
-            <input
-              type="password"
-              value={formData.password || ""}
-              placeholder="Kosongkan jika tidak ingin mengubah"
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              className="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={formData.password || ""}
+                placeholder="Kosongkan jika tidak ingin mengubah"
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                className="w-full p-3 pr-12 rounded-xl border text-gray-900 bg-white border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-blue-600 transition-colors p-2"
+                aria-label={
+                  showPassword ? "Sembunyikan password" : "Tampilkan password"
+                }
+              >
+                {showPassword ? <LuEyeOff size={20} /> : <LuEye size={20} />}
+              </button>
+            </div>
           </div>
         </div>
 
