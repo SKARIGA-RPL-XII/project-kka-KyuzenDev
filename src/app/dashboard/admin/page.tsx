@@ -167,7 +167,7 @@ export default function AdminPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               <select
-                className="p-2 text-sm border rounded-lg outline-blue-500 bg-white text-black"
+                className="p-2 text-sm border cursor-pointer rounded-lg outline-blue-500 bg-white text-black"
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
               >
