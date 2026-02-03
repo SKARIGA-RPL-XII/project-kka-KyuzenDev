@@ -18,6 +18,8 @@ export default function DashboardLayout({
     handleLogout,
     isProfilePage,
     isStokPage,
+    isStatsPage,
+    isUsersPage,
     router,
   } = useDashboard();
 
@@ -100,7 +102,7 @@ export default function DashboardLayout({
       </nav>
 
       <main className="p-8 max-w-6xl mx-auto">
-        {!isProfilePage && !isStokPage && (
+        {!isProfilePage && !isStokPage && !isStatsPage && !isUsersPage && (
           <header className="mb-8">
             <h2 className="text-3xl font-bold text-gray-900">
               Halo, {user.nama}

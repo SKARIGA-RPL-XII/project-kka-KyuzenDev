@@ -1,6 +1,6 @@
 "use client";
 import { useObat } from "@/hooks/useObat";
-import TableStok from "@/app/components/dashboard/apoteker/TableStok";
+import TableStok from "@/app/components/dashboard/apoteker/components/table/tableStok";
 import Link from "next/link";
 import {
   LuPackage2,
