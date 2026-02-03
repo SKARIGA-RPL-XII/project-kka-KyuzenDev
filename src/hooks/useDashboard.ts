@@ -61,7 +61,8 @@ export function useDashboard() {
   };
 
   const isProfilePage = pathname.includes("/profil");
-
+  const isStokPage = pathname.includes("/stok");
+  
   return {
     user,
     isMounted,
@@ -70,6 +71,7 @@ export function useDashboard() {
     dropdownRef,
     handleLogout,
     isProfilePage,
+    isStokPage,
     router,
   };
 }
