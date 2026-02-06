@@ -3,7 +3,6 @@ import { Obat } from "./useObat";
 
 export function useObatLogic(data: Obat[], refreshData: () => Promise<void>) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -15,13 +14,9 @@ export function useObatLogic(data: Obat[], refreshData: () => Promise<void>) {
       const matchesSearch =
         item.nama_obat.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.kategori.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesFilter =
-        roleFilter === "All" || item.kategori === roleFilter;
-
-      return matchesSearch && matchesFilter;
+      return matchesSearch;
     });
-  }, [data, searchTerm, roleFilter]);
+  }, [data, searchTerm]);
 
   const totalItems = filteredData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -59,16 +54,9 @@ export function useObatLogic(data: Obat[], refreshData: () => Promise<void>) {
     setCurrentPage(1);
   };
 
-  const handleFilterChange = (filter: string) => {
-    setRoleFilter(filter);
-    setCurrentPage(1);
-  };
-
   return {
     searchTerm,
     handleSearchChange,
-    roleFilter,
-    handleFilterChange,
     currentItems,
     currentPage,
     setCurrentPage,

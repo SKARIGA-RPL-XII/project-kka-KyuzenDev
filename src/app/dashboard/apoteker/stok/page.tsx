@@ -28,8 +28,6 @@ export default function StokPage() {
   const {
     searchTerm,
     handleSearchChange,
-    roleFilter,
-    handleFilterChange,
     currentItems,
     currentPage,
     setCurrentPage,
@@ -108,17 +106,6 @@ export default function StokPage() {
               onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-gray-50 text-black border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-sm"
             />
-          </div>
-          <div className="flex gap-2">
-            <select
-              value={roleFilter}
-              onChange={(e) => handleFilterChange(e.target.value)}
-              className="px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none"
-            >
-              <option value="All">Semua</option>
-              <option value="Tablet">Tablet</option>
-              <option value="Sirup">Sirup</option>
-            </select>
           </div>
         </div>
 
