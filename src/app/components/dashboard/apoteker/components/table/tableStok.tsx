@@ -7,6 +7,7 @@ import {
   LuTrash2,
   LuPencilLine,
   LuChevronUp,
+  LuCheck,
 } from "react-icons/lu";
 
 interface TableStokProps {
@@ -63,7 +64,6 @@ export default function TableStok({ data, onEdit, onDelete }: TableStokProps) {
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
-                      {/* 1. Tampilkan Angka Stok */}
                       <span
                         className={`text-sm font-extrabold ${
                           item.stok < 10 ? "text-red-500" : "text-gray-700"
@@ -76,9 +76,7 @@ export default function TableStok({ data, onEdit, onDelete }: TableStokProps) {
                           Kritis
                         </span>
                       ) : item.stok > 100 ? (
-                        <span className="text-xs text-gray-500 font-medium">
-                          Stok Aman
-                        </span>
+                        <LuCheck size={16} className="text-emerald-500" />
                       ) : (
                         <div className="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
                           <div
