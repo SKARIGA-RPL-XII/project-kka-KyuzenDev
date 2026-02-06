@@ -20,6 +20,17 @@ export default function TableUser({
   handleRoleChange,
   handleDelete,
 }: TableUserProps) {
+  type BufferJSON = { type: "Buffer"; data: number[] };
+  function isBufferJSON(obj: unknown): obj is BufferJSON {
+    return (
+      typeof obj === "object" &&
+      obj !== null &&
+      "type" in obj &&
+      (obj as Record<string, unknown>).type === "Buffer" &&
+      "data" in obj &&
+      Array.isArray((obj as Record<string, unknown>).data)
+    );
+  }
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-100">
@@ -42,13 +53,23 @@ export default function TableUser({
                     <div className="w-11 h-11 rounded-full overflow-hidden relative border-2 border-white shadow-sm bg-gray-100 flex-shrink-0">
                       <Image
                         src={
-                          user.photo_profile?.startsWith("data:image")
-                            ? user.photo_profile
-                            : "/dummy_user.png"
+                          !user.photo_profile
+                            ? "/dummy_user.png"
+                            :
+                              typeof user.photo_profile === "string" &&
+                                user.photo_profile.startsWith("data:")
+                              ? user.photo_profile
+                              :
+                                isBufferJSON(user.photo_profile)
+                                ? `data:image/jpeg;base64,${Buffer.from(
+                                    user.photo_profile.data,
+                                  ).toString("base64")}`
+                                :
+                                  "/dummy_user.png"
                         }
                         alt={user.nama}
                         fill
-                        className="object-cover"
+                        className="object-cover rounded-full"
                         unoptimized
                       />
                     </div>

@@ -16,7 +16,7 @@ export const getAdminStats = async () => {
 };
 export const getAllUsers = async () => {
   const [rows] = await db.query<RowDataPacket[]>(
-    "SELECT id, nama, email, role FROM user ORDER BY createdAt DESC",
+    "SELECT id, nama, email, role, photo_profile FROM user ORDER BY createdAt DESC",
   );
   return rows;
 };
