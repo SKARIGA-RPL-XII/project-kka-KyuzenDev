@@ -89,7 +89,7 @@ export default function TableStok({ data, onEdit, onDelete }: TableStokProps) {
                   </button>
 
                   {openDropdownId === item.id.toString() && (
-                    <div className="absolute right-8 top-14 w-40 bg-white border border-gray-100 rounded-2xl shadow-lg z-10 p-2 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute right-8 top-14 w-40 bg-white border border-gray-200 rounded-2xl shadow-lg z-10 p-2 animate-in fade-in zoom-in-95 duration-200">
                       <button
                         onClick={() => {
                           onEdit(item);

@@ -33,7 +33,7 @@ export default function TableUser({
   }
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-100">
+      <table className="min-w-full divide-y divide-gray-50">
         <thead>
           <tr className="bg-gray-50/50 text-gray-400 text-[13px] uppercase tracking-wider font-semibold">
             <th className="px-8 py-4 text-left">Pengguna</th>

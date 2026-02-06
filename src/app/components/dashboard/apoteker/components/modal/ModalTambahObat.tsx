@@ -34,7 +34,7 @@ export default function ModalTambahObat({
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full"
+            className="p-2 text-gray-400 cursor-pointer hover:text-gray-600 rounded-full hover:bg-gray-100"
           >
             <LuX size={20} />
           </button>
@@ -106,7 +106,7 @@ export default function ModalTambahObat({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-gray-700 hover:bg-gray-100 font-semibold"
+              className="px-5 py-2.5 cursor-pointer rounded-xl text-gray-700 hover:bg-gray-200 bg-gray-100 font-semibold"
             >
               Batal
             </button>

@@ -32,7 +32,7 @@ export default function UsersPage() {
         </h1>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-50 flex flex-col sm:flex-row gap-4 justify-between">
           <div className="relative w-full sm:w-96">
             <LuSearch
@@ -69,7 +69,7 @@ export default function UsersPage() {
         />
 
         {totalPages > 1 && (
-          <div className="p-6 border-t text-black border-gray-50 bg-gray-50/30 flex justify-between items-center">
+          <div className="p-6 border-t text-black border-gray-200 bg-gray-50/30 flex justify-between items-center">
             <p className="text-sm text-gray-500 font-medium">
               Halaman {currentPage} dari {totalPages}
             </p>

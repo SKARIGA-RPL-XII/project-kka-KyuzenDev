@@ -63,7 +63,7 @@ export default function StokPage() {
           </div>
         </div>
         <button
-          onClick={() => setIsModalOpen(true)} // Buka modal
+          onClick={() => setIsModalOpen(true)}
           className="bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-200 font-semibold"
         >
           <LuPlus size={20} strokeWidth={3} />
@@ -92,7 +92,7 @@ export default function StokPage() {
         />
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-50 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white">
           <div className="relative w-full sm:w-96">
             <LuSearch
@@ -104,7 +104,7 @@ export default function StokPage() {
               placeholder="Cari nama obat atau kategori..."
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 bg-gray-50 text-black border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-sm"
+              className="w-full pl-11 pr-4 py-2.5 bg-gray-50 text-black border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-sm"
             />
           </div>
         </div>
@@ -130,7 +130,7 @@ export default function StokPage() {
         )}
 
         {totalPages > 1 && (
-          <div className="p-6 border-t border-gray-50 bg-gray-50/30 flex justify-between items-center">
+          <div className="p-6 border-t border-gray-200 bg-gray-50/30 flex justify-between items-center">
             <p className="text-sm text-gray-500 font-medium">
               Halaman {currentPage} dari {totalPages}
             </p>

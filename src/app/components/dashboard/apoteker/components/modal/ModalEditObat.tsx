@@ -75,7 +75,7 @@ export default function ModalEditObat({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+            className="p-2 text-gray-400 cursor-pointer hover:text-gray-600 rounded-full hover:bg-gray-100"
           >
             <LuX size={20} />
           </button>
