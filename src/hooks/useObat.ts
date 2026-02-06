@@ -1,4 +1,3 @@
-// hooks/useObat.ts
 import { useState, useEffect } from "react";
 
 export interface Obat {

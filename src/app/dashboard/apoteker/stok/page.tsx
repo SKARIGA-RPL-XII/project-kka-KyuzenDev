@@ -1,13 +1,16 @@
 "use client";
 import { useObat } from "@/hooks/useObat";
+import { useObatLogic } from "@/hooks/useObatLogic";
 import TableStok from "@/app/components/dashboard/apoteker/components/table/tableStok";
 import Link from "next/link";
+import { useState } from "react";
+import ModalTambahObat from "@/app/components/dashboard/apoteker/components/modal/ModalTambahObat";
+import ModalEditObat from "@/app/components/dashboard/apoteker/components/modal/ModalEditObat";
 import {
   LuPackage2,
   LuArrowLeft,
   LuPlus,
   LuSearch,
-  LuFilter,
   LuCircleAlert,
   LuCircleCheck,
 } from "react-icons/lu";
@@ -19,13 +22,31 @@ interface StatCardProps {
 }
 
 export default function StokPage() {
-  const { data, loading } = useObat();
+  const { data, loading, refresh } = useObat();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const {
+    searchTerm,
+    handleSearchChange,
+    roleFilter,
+    handleFilterChange,
+    currentItems,
+    currentPage,
+    setCurrentPage,
+    handleEditClick,
+    handleDelete,
+    totalPages,
+    isEditModalOpen,
+    setIsEditModalOpen,
+    selectedObat,
+  } = useObatLogic(data, refresh);
+
   const totalStok = data.length;
   const stokRendah = data.filter((item) => item.stok < 10).length;
   const stokAman = totalStok - stokRendah;
 
   return (
-    <div className="space-y-8 bg-[#f8fafc] min-h-screen">
+    <div className="space-y-8 bg-[#f8fafc] min-h-screen text-black">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Link
@@ -43,7 +64,10 @@ export default function StokPage() {
             </p>
           </div>
         </div>
-        <button className="bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-200 font-semibold">
+        <button
+          onClick={() => setIsModalOpen(true)} // Buka modal
+          className="bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-200 font-semibold"
+        >
           <LuPlus size={20} strokeWidth={3} />
           <span>Tambah Obat Baru</span>
         </button>
@@ -80,13 +104,22 @@ export default function StokPage() {
             <input
               type="text"
               placeholder="Cari nama obat atau kategori..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full pl-11 pr-4 py-2.5 bg-gray-50 text-black border border-gray-100 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-sm"
             />
           </div>
-          <button className="flex items-center cursor-pointer gap-2 px-4 py-2.5 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all text-sm font-medium">
-            <LuFilter size={18} />
-            Filter
-          </button>
+          <div className="flex gap-2">
+            <select
+              value={roleFilter}
+              onChange={(e) => handleFilterChange(e.target.value)}
+              className="px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none"
+            >
+              <option value="All">Semua</option>
+              <option value="Tablet">Tablet</option>
+              <option value="Sirup">Sirup</option>
+            </select>
+          </div>
         </div>
 
         {loading ? (
@@ -98,13 +131,54 @@ export default function StokPage() {
               <p className="text-gray-900 font-bold text-lg">
                 Menyinkronkan Data
               </p>
-              <p className="text-gray-400 text-sm">Mohon tunggu sebentar...</p>
+              <p className="text-gray-400 text-sm">Memuat data...</p>
             </div>
           </div>
         ) : (
-          <TableStok data={data} />
+          <TableStok
+            data={currentItems}
+            onEdit={handleEditClick}
+            onDelete={handleDelete}
+          />
+        )}
+
+        {totalPages > 1 && (
+          <div className="p-6 border-t border-gray-50 bg-gray-50/30 flex justify-between items-center">
+            <p className="text-sm text-gray-500 font-medium">
+              Halaman {currentPage} dari {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50"
+              >
+                Prev
+              </button>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         )}
       </div>
+      <ModalTambahObat
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={refresh}
+      />
+      {isEditModalOpen && selectedObat && (
+        <ModalEditObat
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSuccess={refresh}
+          obat={selectedObat}
+        />
+      )}
     </div>
   );
 }
