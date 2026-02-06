@@ -134,7 +134,7 @@ export default function ModalEditObat({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Harga Jual
+              Harga Jual (Rp)
             </label>
             <input
               type="number"
