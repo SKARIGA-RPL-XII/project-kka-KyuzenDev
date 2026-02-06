@@ -63,6 +63,7 @@ export default function TableStok({ data, onEdit, onDelete }: TableStokProps) {
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
+                      {/* 1. Tampilkan Angka Stok */}
                       <span
                         className={`text-sm font-extrabold ${
                           item.stok < 10 ? "text-red-500" : "text-gray-700"
@@ -73,6 +74,10 @@ export default function TableStok({ data, onEdit, onDelete }: TableStokProps) {
                       {item.stok < 10 ? (
                         <span className="text-[10px] text-red-500 font-bold bg-red-50 px-2 py-0.5 rounded-md uppercase">
                           Kritis
+                        </span>
+                      ) : item.stok > 100 ? (
+                        <span className="text-xs text-gray-500 font-medium">
+                          Stok Aman
                         </span>
                       ) : (
                         <div className="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden hidden sm:block">

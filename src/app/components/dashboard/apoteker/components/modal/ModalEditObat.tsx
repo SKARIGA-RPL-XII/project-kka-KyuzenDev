@@ -119,9 +119,13 @@ export default function ModalEditObat({
               <input
                 type="number"
                 value={formData.stok}
-                onChange={(e) =>
-                  setFormData({ ...formData, stok: parseInt(e.target.value) })
-                }
+                min="0"
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  const validatedValue = Math.max(0, isNaN(value) ? 0 : value);
+
+                  setFormData({ ...formData, stok: validatedValue });
+                }}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-200 focus:border-emerald-500 outline-none"
                 required
               />
