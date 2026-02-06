@@ -29,6 +29,9 @@ export function useTambahObat(
     setLoading(true);
 
     try {
+      const validatedStok = Math.max(0, Number(formData.stok) || 0);
+      const validatedHarga = Math.max(0, Number(formData.harga) || 0);
+
       const response = await fetch("/api/obat", {
         method: "POST",
         headers: {
@@ -36,8 +39,8 @@ export function useTambahObat(
         },
         body: JSON.stringify({
           ...formData,
-          stok: Number(formData.stok),
-          harga: Number(formData.harga),
+          stok: validatedStok,
+          harga: validatedHarga,
         }),
       });
 
@@ -49,7 +52,7 @@ export function useTambahObat(
 
       onSuccessCallback();
       onCloseCallback();
-      setFormData({ nama_obat: "", kategori: "", stok: "", harga: "" });
+      setFormData({ nama_obat: "", kategori: "", stok: 0, harga: 0 });
     } catch (error) {
       console.error(error);
       alert("Terjadi kesalahan saat menyimpan data");

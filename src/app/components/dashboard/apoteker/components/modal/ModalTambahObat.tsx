@@ -1,5 +1,5 @@
 "use client";
-import { useTambahObat } from "@/hooks/useTambahObat"; // Import hook baru
+import { useTambahObat } from "@/hooks/useTambahObat";
 import { LuX, LuPackagePlus } from "react-icons/lu";
 
 interface ModalTambahObatProps {
@@ -81,6 +81,7 @@ export default function ModalTambahObat({
                 required
                 className="w-full mt-1.5 p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
                 placeholder="0"
+                min="0"
                 value={formData.stok}
                 onChange={handleChange}
               />
