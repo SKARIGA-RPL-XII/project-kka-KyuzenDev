@@ -147,14 +147,14 @@ export default function ModalEditObat({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-gray-700 hover:bg-gray-100 font-semibold"
+              className="px-5 py-2.5 rounded-xl cursor-pointer text-gray-700 hover:bg-gray-200 bg-gray-100 font-semibold"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 font-semibold disabled:bg-gray-400"
+              className="px-5 py-2.5 rounded-xl cursor-pointer bg-emerald-600 text-white hover:bg-emerald-700 font-semibold disabled:bg-gray-400"
             >
               {loading ? "Menyimpan..." : "Simpan Perubahan"}
             </button>
