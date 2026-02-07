@@ -58,3 +58,33 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function GET(request: NextRequest) {
+  try {
+    const token = request.cookies.get("token")?.value;
+
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET as string);
+
+    const query = `
+      SELECT p.*, u.nama as nama_pasien 
+      FROM pesanan p
+      JOIN user u ON p.user_id = u.id
+      WHERE p.status = 'Menunggu Konfirmasi'
+      ORDER BY p.createdAt DESC
+    `;
+
+    const [rows] = await db.execute(query);
+
+    return NextResponse.json({ data: rows }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+}

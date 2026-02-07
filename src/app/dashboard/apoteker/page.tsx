@@ -6,11 +6,12 @@ import {
   LuChevronRight,
 } from "react-icons/lu";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ApotekerPage() {
   const router = useRouter();
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -20,7 +21,24 @@ export default function ApotekerPage() {
       else router.push("/auth/login");
     }
   }, [router]);
+useEffect(() => {
+  const fetchPendingOrdersCount = async () => {
+    try {
+      const response = await fetch("/api/pesanan/count?status=pending");
+      if (response.ok) {
+        const data = await response.json();
+        setPendingCount(data.count);
+      }
+    } catch (error) {
+      console.error("Gagal mengambil jumlah pesanan", error);
+    }
+  };
 
+  fetchPendingOrdersCount();
+
+  const interval = setInterval(fetchPendingOrdersCount, 30000);
+  return () => clearInterval(interval);
+}, []);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <Link href="/dashboard/apoteker/stok">
@@ -47,27 +65,35 @@ export default function ApotekerPage() {
         </div>
       </Link>
 
-      <div className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-emerald-100 hover:border-emerald-400 hover:shadow-md transition-all group">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-5">
-            <div className="p-4 bg-emerald-50 rounded-2xl text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
-              <LuClipboardList size={32} />
+      <Link href="/dashboard/apoteker/pesanan-masuk">
+        <div className="relative bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-emerald-100 hover:border-emerald-400 hover:shadow-md transition-all group">
+          {pendingCount > 0 && (
+            <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold">
+              {pendingCount > 99 ? "99+" : pendingCount}
+            </span>
+          )}
+
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-5">
+              <div className="p-4 bg-emerald-50 rounded-2xl text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+                <LuClipboardList size={32} />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl mb-1 text-gray-800 group-hover:text-emerald-600 transition-colors">
+                  Pesanan Masuk
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  Verifikasi resep dan pesanan.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold text-xl mb-1 text-gray-800 group-hover:text-emerald-600 transition-colors">
-                Pesanan Masuk
-              </h3>
-              <p className="text-gray-500 text-sm">
-                Verifikasi resep dan pesanan.
-              </p>
-            </div>
+            <LuChevronRight
+              size={24}
+              className="text-gray-300 group-hover:text-emerald-500 group-hover:translate-x-2 transition-all"
+            />
           </div>
-          <LuChevronRight
-            size={24}
-            className="text-gray-300 group-hover:text-emerald-500 group-hover:translate-x-2 transition-all"
-          />
         </div>
-      </div>
+      </Link>
       <Link href="/dashboard/profile">
         <div className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-gray-100 hover:border-gray-400 hover:shadow-md transition-all group">
           <div className="flex justify-between items-center">

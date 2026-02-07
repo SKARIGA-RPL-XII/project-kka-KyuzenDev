@@ -1,0 +1,213 @@
+"use client";
+
+import Link from "next/link";
+import {
+  LuEye,
+  LuCheck,
+  LuCircleMinus,
+  LuArrowLeft,
+  LuSearch,
+  LuClipboardList,
+  LuCircleAlert,
+  LuChevronLeft,
+  LuChevronRight,
+} from "react-icons/lu";
+import { usePesananMasuk } from "@/hooks/usePesananMasuk";
+
+interface StatCardProps {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  color: "blue" | "red" | "emerald";
+}
+
+export default function PesananMasukPage() {
+  const {
+    currentItems,
+    loading,
+    searchTerm,
+    setSearchTerm,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    totalPesanan,
+    menungguKonfirmasi,
+    handleUpdateStatus,
+  } = usePesananMasuk();
+
+  return (
+    <div className="space-y-8 bg-[#f8fafc] min-h-screen text-black p-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard/apoteker"
+            className="p-2.5 bg-white text-gray-600 border border-gray-200 hover:border-emerald-500 hover:text-emerald-600 rounded-xl transition-all shadow-sm"
+          >
+            <LuArrowLeft size={20} />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+              Pesanan Masuk
+            </h1>
+            <p className="text-gray-500 font-medium">
+              Verifikasi resep dan keluhan pasien
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <StatCard
+          icon={<LuClipboardList />}
+          label="Total Pesanan Masuk"
+          value={totalPesanan}
+          color="blue"
+        />
+        <StatCard
+          icon={<LuCircleAlert />}
+          label="Menunggu Konfirmasi"
+          value={menungguKonfirmasi}
+          color="red"
+        />
+      </div>
+
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="p-6 border-b border-gray-50 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white">
+          <div className="relative w-full sm:w-96">
+            <LuSearch
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder="Cari ID Pesanan atau Nama Pasien..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-11 pr-4 py-2.5 bg-gray-50 text-black border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-sm"
+            />
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="p-32 flex flex-col items-center justify-center gap-4">
+            <div className="h-16 w-16 rounded-full border-4 border-emerald-100 border-t-emerald-600 animate-spin"></div>
+            <p className="text-gray-900 font-bold text-lg">
+              Menyinkronkan Data
+            </p>
+          </div>
+        ) : currentItems.length === 0 ? (
+          <div className="text-center py-32 text-gray-500">
+            Tidak ada pesanan masuk.
+          </div>
+        ) : (
+          <div className="px-6 pb-6 grid gap-4">
+            {currentItems.map((pesanan) => (
+              <div
+                key={pesanan.id}
+                className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center hover:shadow-md transition-shadow"
+              >
+                <div>
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                      #{pesanan.id}
+                    </p>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        pesanan.status === "Menunggu Konfirmasi"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {pesanan.status}
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-lg text-gray-900 mt-1">
+                    {pesanan.nama_pasien}
+                  </h3>
+                  <p className="text-gray-600 text-sm mt-1 mb-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    {pesanan.keluhan}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {new Date(pesanan.createdAt).toLocaleString("id-ID")}
+                  </p>
+                </div>
+
+                <div className="flex gap-2">
+                  {pesanan.foto_resep && (
+                    <a
+                      href={pesanan.foto_resep}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
+                      title="Lihat Resep"
+                    >
+                      <LuEye size={20} />
+                    </a>
+                  )}
+                  <button
+                    onClick={() => handleUpdateStatus(pesanan.id, "Diproses")}
+                    className="p-3 cursor-pointer rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+                    title="Terima Pesanan"
+                  >
+                    <LuCheck size={20} />
+                  </button>
+                  <button
+                    onClick={() => handleUpdateStatus(pesanan.id, "Dibatalkan")}
+                    className="p-3 cursor-pointer rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                    title="Batalkan Pesanan"
+                  >
+                    <LuCircleMinus size={20} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="p-6 border-t border-gray-200 bg-gray-50/30 flex justify-between items-center">
+            <p className="text-sm text-gray-500 font-medium">
+              Halaman {currentPage} dari {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="p-2.5 cursor-pointer bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <LuChevronLeft size={20} />
+              </button>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="p-2.5 cursor-pointer bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <LuChevronRight size={20} />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ icon, label, value, color }: StatCardProps) {
+  const colors: Record<string, string> = {
+    blue: "bg-blue-50 text-blue-600",
+    red: "bg-red-50 text-red-600",
+    emerald: "bg-emerald-50 text-emerald-600",
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5">
+      <div className={`p-4 rounded-2xl ${colors[color]}`}>{icon}</div>
+      <div>
+        <p className="text-sm font-medium text-gray-500">{label}</p>
+        <p className="text-3xl font-bold text-gray-900">{value}</p>
+      </div>
+    </div>
+  );
+}
