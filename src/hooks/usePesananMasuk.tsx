@@ -37,6 +37,15 @@ export const usePesananMasuk = () => {
   };
 
   const handleUpdateStatus = async (id: number, newStatus: string) => {
+    const message =
+      newStatus === "Dibatalkan"
+        ? "Apakah Anda yakin ingin membatalkan pesanan ini?"
+        : "Apakah Anda yakin ingin memproses pesanan ini?";
+
+    if (!window.confirm(message)) {
+      return;
+    }
+
     try {
       const response = await fetch("/api/pesanan/update", {
         method: "POST",
