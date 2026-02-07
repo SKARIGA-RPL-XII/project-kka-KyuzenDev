@@ -13,6 +13,8 @@ import {
   LuChevronRight,
 } from "react-icons/lu";
 import { usePesananMasuk } from "@/hooks/usePesananMasuk";
+import { useState } from "react";
+import ModalResep from "@/app/components/dashboard/apoteker/components/modal/ModalResep";
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -34,7 +36,11 @@ export default function PesananMasukPage() {
     menungguKonfirmasi,
     handleUpdateStatus,
   } = usePesananMasuk();
-
+  const [selectedResep, setSelectedResep] = useState<{
+    nama: string;
+    tanggal: string;
+    foto: string;
+  } | null>(null);
   return (
     <div className="space-y-8 bg-[#f8fafc] min-h-screen text-black p-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -133,17 +139,21 @@ export default function PesananMasukPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  {pesanan.foto_resep && (
-                    <a
-                      href={pesanan.foto_resep}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
-                      title="Lihat Resep"
-                    >
-                      <LuEye size={20} />
-                    </a>
-                  )}
+                  <button
+                    onClick={() =>
+                      setSelectedResep({
+                        nama: pesanan.nama_pasien,
+                        tanggal: new Date(pesanan.createdAt).toLocaleString(
+                          "id-ID",
+                        ),
+                        foto: pesanan.foto_resep!,
+                      })
+                    }
+                    className="p-3 rounded-xl cursor-pointer bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
+                    title="Lihat Resep"
+                  >
+                    <LuEye size={20} />
+                  </button>
                   <button
                     onClick={() => handleUpdateStatus(pesanan.id, "Diproses")}
                     className="p-3 cursor-pointer rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
@@ -159,6 +169,14 @@ export default function PesananMasukPage() {
                     <LuCircleMinus size={20} />
                   </button>
                 </div>
+                <ModalResep
+                  isOpen={!!selectedResep}
+                  onClose={() => setSelectedResep(null)}
+                  keluhan={pesanan.keluhan}
+                  namaPasien={selectedResep?.nama || ""}
+                  tanggal={selectedResep?.tanggal || ""}
+                  fotoResep={selectedResep?.foto || ""}
+                />
               </div>
             ))}
           </div>
