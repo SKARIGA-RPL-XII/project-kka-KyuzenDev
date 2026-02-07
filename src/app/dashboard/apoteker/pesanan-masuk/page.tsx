@@ -144,121 +144,123 @@ export default function PesananMasukPage() {
             Tidak ada pesanan masuk.
           </div>
         ) : (
-          <div className="px-6 pb-6 grid gap-4">
-            {currentItems.map((pesanan) => (
-              <div
-                key={pesanan.id}
-                className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center hover:shadow-md transition-shadow"
-              >
-                <div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                      #{pesanan.id}
+          <div className="overflow-x-auto">
+            <div className="px-6 pb-6 grid gap-4">
+              {currentItems.map((pesanan) => (
+                <div
+                  key={pesanan.id}
+                  className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center hover:shadow-md transition-shadow"
+                >
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                        #{pesanan.id}
+                      </p>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          pesanan.status === "Menunggu Konfirmasi"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : pesanan.status === "Diproses"
+                              ? "bg-blue-100 text-blue-700"
+                              : pesanan.status === "Selesai"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : pesanan.status === "Dibatalkan"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {pesanan.status}
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-lg text-gray-900 mt-1">
+                      {pesanan.nama_pasien}
+                    </h3>
+                    <p className="text-gray-600 text-sm mt-1 mb-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                      {pesanan.keluhan}
                     </p>
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        pesanan.status === "Menunggu Konfirmasi"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : pesanan.status === "Diproses"
-                            ? "bg-blue-100 text-blue-700"
-                            : pesanan.status === "Selesai"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : pesanan.status === "Dibatalkan"
-                                ? "bg-red-100 text-red-700"
-                                : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {pesanan.status}
-                    </span>
+                    <p className="text-xs text-gray-400">
+                      {new Date(pesanan.createdAt).toLocaleString("id-ID")}
+                    </p>
                   </div>
-                  <h3 className="font-bold text-lg text-gray-900 mt-1">
-                    {pesanan.nama_pasien}
-                  </h3>
-                  <p className="text-gray-600 text-sm mt-1 mb-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                    {pesanan.keluhan}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {new Date(pesanan.createdAt).toLocaleString("id-ID")}
-                  </p>
-                </div>
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={() =>
-                      setSelectedResep({
-                        nama: pesanan.nama_pasien,
-                        tanggal: new Date(pesanan.createdAt).toLocaleString(
-                          "id-ID",
-                        ),
-                        foto: pesanan.foto_resep!,
-                        keluhan: pesanan.keluhan,
-                      })
-                    }
-                    className="p-3 rounded-xl cursor-pointer bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
-                    title="Lihat Resep"
-                  >
-                    <LuEye size={20} />
-                  </button>
-
-                  {activeTab === "Menunggu Konfirmasi" && (
-                    <>
-                      <button
-                        onClick={() =>
-                          handleUpdateStatus(pesanan.id, "Diproses")
-                        }
-                        className="p-3 cursor-pointer rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
-                        title="Terima Pesanan"
-                      >
-                        <LuCheck size={20} />
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleUpdateStatus(pesanan.id, "Dibatalkan")
-                        }
-                        className="p-3 cursor-pointer rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                        title="Batalkan Pesanan"
-                      >
-                        <LuCircleMinus size={20} />
-                      </button>
-                    </>
-                  )}
-
-                  {activeTab === "Diproses" && (
+                  <div className="flex gap-2">
                     <button
-                      onClick={() => openProcessModal(pesanan.id)}
-                      className="px-4 py-2 cursor-pointer rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-2 text-sm font-semibold"
-                      title="Proses & Selesaikan"
+                      onClick={() =>
+                        setSelectedResep({
+                          nama: pesanan.nama_pasien,
+                          tanggal: new Date(pesanan.createdAt).toLocaleString(
+                            "id-ID",
+                          ),
+                          foto: pesanan.foto_resep!,
+                          keluhan: pesanan.keluhan,
+                        })
+                      }
+                      className="p-3 rounded-xl cursor-pointer bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
+                      title="Lihat Resep"
                     >
-                      <LuClipboard size={18} />
-                      Proses & Selesaikan
+                      <LuEye size={20} />
                     </button>
-                  )}
-                </div>
-              </div>
-            ))}
-            {selectedResep && (
-              <ModalResep
-                isOpen={!!selectedResep}
-                onClose={() => setSelectedResep(null)}
-                keluhan={selectedResep.keluhan}
-                namaPasien={selectedResep.nama}
-                tanggal={selectedResep.tanggal}
-                fotoResep={selectedResep.foto}
-              />
-            )}
 
-            {isModalOpen && selectedPesananId && (
-              <ModalProsesPesanan
-                pesananId={selectedPesananId}
-                onClose={() => {
-                  setIsModalOpen(false);
-                  setSelectedPesananId(null);
-                }}
-                onSave={(data) => {
-                  handleUpdateStatus(selectedPesananId, "Selesai", data);
-                }}
-              />
-            )}
+                    {activeTab === "Menunggu Konfirmasi" && (
+                      <>
+                        <button
+                          onClick={() =>
+                            handleUpdateStatus(pesanan.id, "Diproses")
+                          }
+                          className="p-3 cursor-pointer rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+                          title="Terima Pesanan"
+                        >
+                          <LuCheck size={20} />
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleUpdateStatus(pesanan.id, "Dibatalkan")
+                          }
+                          className="p-3 cursor-pointer rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                          title="Batalkan Pesanan"
+                        >
+                          <LuCircleMinus size={20} />
+                        </button>
+                      </>
+                    )}
+
+                    {activeTab === "Diproses" && (
+                      <button
+                        onClick={() => openProcessModal(pesanan.id)}
+                        className="px-4 py-2 cursor-pointer rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-2 text-sm font-semibold"
+                        title="Proses & Selesaikan"
+                      >
+                        <LuClipboard size={18} />
+                        Proses & Selesaikan
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {selectedResep && (
+                <ModalResep
+                  isOpen={!!selectedResep}
+                  onClose={() => setSelectedResep(null)}
+                  keluhan={selectedResep.keluhan}
+                  namaPasien={selectedResep.nama}
+                  tanggal={selectedResep.tanggal}
+                  fotoResep={selectedResep.foto}
+                />
+              )}
+
+              {isModalOpen && selectedPesananId && (
+                <ModalProsesPesanan
+                  pesananId={selectedPesananId}
+                  onClose={() => {
+                    setIsModalOpen(false);
+                    setSelectedPesananId(null);
+                  }}
+                  onSave={(data) => {
+                    handleUpdateStatus(selectedPesananId, "Selesai", data);
+                  }}
+                />
+              )}
+            </div>
           </div>
         )}
 
