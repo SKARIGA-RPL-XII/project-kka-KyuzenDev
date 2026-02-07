@@ -5,18 +5,45 @@ import {
   LuUser,
   LuChevronRight,
 } from "react-icons/lu";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useOrder } from "@/hooks/useOrder";
+import OrderModal from "@/app/components/dashboard/pasien/components/modal/OrderModal";
+
 export default function PasienPage() {
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { placeOrder, loading } = useOrder();
+
+  const handleOrderSubmit = async (data: {
+    keluhan: string;
+    foto_resep: File | null;
+  }) => {
+    try {
+      await placeOrder({
+        keluhan: data.keluhan,
+        total_harga: 0,
+        foto_resep: data.foto_resep,
+      });
+      alert("Pesanan berhasil dikirim!");
+      setIsModalOpen(false);
+    } catch (err) {
+      alert(
+        `Gagal: ${err instanceof Error ? err.message : "Terjadi kesalahan"}`,
+      );
+    }
+  };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    if (user.role !== "Pasien") {
-      if (user.role === "Admin") router.replace("/dashboard/admin");
-      else if (user.role === "Apoteker") router.replace("/dashboard/apoteker");
-      else router.push("/auth/login");
+    if (typeof window !== "undefined") {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user.role !== "Pasien") {
+        if (user.role === "Admin") router.replace("/dashboard/admin");
+        else if (user.role === "Apoteker")
+          router.replace("/dashboard/apoteker");
+        else router.push("/auth/login");
+      }
     }
   }, [router]);
 
@@ -43,7 +70,10 @@ export default function PasienPage() {
           />
         </div>
       </div>
-      <div className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-blue-100 hover:border-blue-400 hover:shadow-md transition-all group">
+      <div
+        onClick={() => setIsModalOpen(true)}
+        className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-blue-100 hover:border-blue-400 hover:shadow-md transition-all group"
+      >
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-5">
             <div className="p-4 bg-blue-50 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
@@ -54,7 +84,7 @@ export default function PasienPage() {
                 Pesan Obat
               </h3>
               <p className="text-gray-500 text-sm">
-                Cari dan pesan obat dari apotek.
+                {loading ? "Memproses..." : "Cari dan pesan obat dari apotek."}
               </p>
             </div>
           </div>
@@ -87,6 +117,13 @@ export default function PasienPage() {
           </div>
         </div>
       </Link>
+
+      <OrderModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleOrderSubmit}
+        loading={loading}
+      />
     </div>
   );
 }
