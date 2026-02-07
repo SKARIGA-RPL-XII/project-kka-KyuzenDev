@@ -7,7 +7,7 @@ interface Pesanan {
   foto_resep: string | null;
   total_harga: number;
   createdAt: string;
-  status: string;
+  status: "Menunggu Konfirmasi" | "Diproses" | "Selesai" | "Dibatalkan";
 }
 
 export const usePesananMasuk = () => {
@@ -15,6 +15,7 @@ export const usePesananMasuk = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState("Semua");
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -27,10 +28,14 @@ export const usePesananMasuk = () => {
       const response = await fetch("/api/pesanan");
       if (response.ok) {
         const data = await response.json();
-        setPesananList(data.data);
+
+        console.log("Data API:", data);
+
+        setPesananList(Array.isArray(data) ? data : data.data || []);
       }
     } catch (error) {
       console.error("Gagal mengambil data pesanan", error);
+      setPesananList([]); // Set ke array kosong jika error
     } finally {
       setLoading(false);
     }
@@ -52,8 +57,10 @@ export const usePesananMasuk = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),
       });
+
       if (response.ok) {
-        fetchPesanan();
+        console.log("Update berhasil, mengambil data ulang...");
+        await fetchPesanan();
       }
     } catch (error) {
       console.error("Gagal update status", error);
@@ -61,19 +68,35 @@ export const usePesananMasuk = () => {
   };
 
   const filteredPesanan = useMemo(() => {
-    return pesananList.filter(
-      (p) =>
+    if (!Array.isArray(pesananList)) return [];
+
+    return pesananList.filter((p) => {
+      let matchesTab = false;
+
+      if (activeTab === "Semua") {
+        matchesTab = true;
+      } else if (activeTab === "Diproses") {
+        matchesTab = p.status === "Diproses";
+      } else if (activeTab === "Selesai") {
+        matchesTab = p.status === "Selesai";
+      } else {
+        matchesTab = p.status === activeTab;
+      }
+
+      const matchesSearch =
         p.nama_pasien.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.id.toString().includes(searchTerm),
-    );
-  }, [pesananList, searchTerm]);
+        p.id.toString().includes(searchTerm);
+
+      return matchesTab && matchesSearch;
+    });
+  }, [pesananList, searchTerm, activeTab]);
 
   const totalItems = filteredPesanan.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, activeTab]);
 
   const currentItems = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -81,9 +104,9 @@ export const usePesananMasuk = () => {
   }, [filteredPesanan, currentPage]);
 
   const totalPesanan = pesananList.length;
-  const menungguKonfirmasi = pesananList.filter(
-    (p) => p.status === "Menunggu Konfirmasi",
-  ).length;
+  const menungguKonfirmasi = Array.isArray(pesananList)
+    ? pesananList.filter((p) => p.status === "Menunggu Konfirmasi").length
+    : 0;
 
   return {
     currentItems,
@@ -96,5 +119,7 @@ export const usePesananMasuk = () => {
     totalPesanan,
     menungguKonfirmasi,
     handleUpdateStatus,
+    activeTab,
+    setActiveTab,
   };
 };

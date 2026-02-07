@@ -11,6 +11,8 @@ import {
   LuCircleAlert,
   LuChevronLeft,
   LuChevronRight,
+  LuClock3,
+  LuPackageCheck,
 } from "react-icons/lu";
 import { usePesananMasuk } from "@/hooks/usePesananMasuk";
 import { useState } from "react";
@@ -35,12 +37,23 @@ export default function PesananMasukPage() {
     totalPesanan,
     menungguKonfirmasi,
     handleUpdateStatus,
+    activeTab,
+    setActiveTab,
   } = usePesananMasuk();
+
   const [selectedResep, setSelectedResep] = useState<{
+    keluhan: string;
     nama: string;
     tanggal: string;
     foto: string;
   } | null>(null);
+
+  const tabs = [
+    { name: "Semua", icon: LuClipboardList },
+    { name: "Menunggu Konfirmasi", icon: LuCircleAlert },
+    { name: "Diproses", icon: LuClock3 },
+    { name: "Selesai", icon: LuPackageCheck },
+  ];
   return (
     <div className="space-y-8 bg-[#f8fafc] min-h-screen text-black p-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -78,19 +91,37 @@ export default function PesananMasukPage() {
       </div>
 
       <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-50 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white">
-          <div className="relative w-full sm:w-96">
-            <LuSearch
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-              size={18}
-            />
-            <input
-              type="text"
-              placeholder="Cari ID Pesanan atau Nama Pasien..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 bg-gray-50 text-black border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-sm"
-            />
+        <div className="p-6 border-b border-gray-50 flex flex-col gap-4 bg-white">
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div className="relative w-full sm:w-80">
+              <LuSearch
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder="Cari ID Pesanan atau Nama Pasien..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 bg-gray-50 text-black border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-sm"
+              />
+            </div>
+            <div className="flex gap-2 p-1 bg-gray-100 rounded-xl w-full sm:w-auto overflow-x-auto">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.name}
+                  onClick={() => setActiveTab(tab.name)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
+                    activeTab === tab.name
+                      ? "bg-white text-emerald-600 shadow-sm"
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  <tab.icon size={16} />
+                  {tab.name}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -121,7 +152,13 @@ export default function PesananMasukPage() {
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         pesanan.status === "Menunggu Konfirmasi"
                           ? "bg-yellow-100 text-yellow-700"
-                          : "bg-gray-100 text-gray-700"
+                          : pesanan.status === "Diproses"
+                            ? "bg-blue-100 text-blue-700"
+                            : pesanan.status === "Selesai"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : pesanan.status === "Dibatalkan"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-gray-100 text-gray-700"
                       }`}
                     >
                       {pesanan.status}
@@ -147,6 +184,7 @@ export default function PesananMasukPage() {
                           "id-ID",
                         ),
                         foto: pesanan.foto_resep!,
+                        keluhan: pesanan.keluhan,
                       })
                     }
                     className="p-3 rounded-xl cursor-pointer bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
@@ -169,16 +207,18 @@ export default function PesananMasukPage() {
                     <LuCircleMinus size={20} />
                   </button>
                 </div>
-                <ModalResep
-                  isOpen={!!selectedResep}
-                  onClose={() => setSelectedResep(null)}
-                  keluhan={pesanan.keluhan}
-                  namaPasien={selectedResep?.nama || ""}
-                  tanggal={selectedResep?.tanggal || ""}
-                  fotoResep={selectedResep?.foto || ""}
-                />
               </div>
             ))}
+            {selectedResep && (
+              <ModalResep
+                isOpen={!!selectedResep}
+                onClose={() => setSelectedResep(null)}
+                keluhan={selectedResep.keluhan}
+                namaPasien={selectedResep.nama}
+                tanggal={selectedResep.tanggal}
+                fotoResep={selectedResep.foto}
+              />
+            )}
           </div>
         )}
 

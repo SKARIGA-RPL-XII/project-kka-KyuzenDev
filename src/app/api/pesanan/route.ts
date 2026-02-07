@@ -69,15 +69,24 @@ export async function GET(request: NextRequest) {
 
     jwt.verify(token, process.env.JWT_SECRET as string);
 
-    const query = `
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status");
+
+    let query = `
       SELECT p.*, u.nama as nama_pasien 
       FROM pesanan p
       JOIN user u ON p.user_id = u.id
-      WHERE p.status = 'Menunggu Konfirmasi'
-      ORDER BY p.createdAt DESC
     `;
+    const queryParams = [];
 
-    const [rows] = await db.execute(query);
+    if (status && status !== "Semua") {
+      query += ` WHERE p.status = ?`;
+      queryParams.push(status);
+    }
+
+    query += ` ORDER BY p.createdAt DESC`;
+
+    const [rows] = await db.execute(query, queryParams);
 
     return NextResponse.json({ data: rows }, { status: 200 });
   } catch (error) {
