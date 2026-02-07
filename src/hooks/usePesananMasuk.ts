@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 
 interface Pesanan {
   id: number;
@@ -15,56 +15,67 @@ export const usePesananMasuk = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState("Semua");
+  const [activeTab, setActiveTab] = useState("Menunggu Konfirmasi");
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    fetchPesanan();
-  }, []);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPesananId, setSelectedPesananId] = useState<number | null>(
+    null,
+  );
 
-  const fetchPesanan = async () => {
+  const fetchPesanan = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/pesanan");
+      const response = await fetch(`/api/pesanan?status=${activeTab}`);
       if (response.ok) {
         const data = await response.json();
-
-        console.log("Data API:", data);
-
         setPesananList(Array.isArray(data) ? data : data.data || []);
       }
     } catch (error) {
-      console.error("Gagal mengambil data pesanan", error);
-      setPesananList([]); // Set ke array kosong jika error
+      console.error(error);
+      setPesananList([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
 
-  const handleUpdateStatus = async (id: number, newStatus: string) => {
-    const message =
-      newStatus === "Dibatalkan"
-        ? "Apakah Anda yakin ingin membatalkan pesanan ini?"
-        : "Apakah Anda yakin ingin memproses pesanan ini?";
+  useEffect(() => {
+    fetchPesanan();
+  }, [activeTab, fetchPesanan]);
 
-    if (!window.confirm(message)) {
-      return;
+  const handleUpdateStatus = async (
+    id: number,
+    newStatus: string,
+    additionalData = {},
+  ) => {
+    if (newStatus === "Dibatalkan") {
+      if (!window.confirm("Yakin ingin membatalkan pesanan ini?")) {
+        return;
+      }
     }
 
     try {
       const response = await fetch("/api/pesanan/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: newStatus }),
+        body: JSON.stringify({ id, status: newStatus, ...additionalData }),
       });
 
       if (response.ok) {
-        console.log("Update berhasil, mengambil data ulang...");
         await fetchPesanan();
+        if (newStatus === "Selesai") {
+          setIsModalOpen(false);
+          setSelectedPesananId(null);
+        }
       }
     } catch (error) {
-      console.error("Gagal update status", error);
+      console.error(error);
     }
+  };
+
+  const openProcessModal = (id: number) => {
+    setSelectedPesananId(id);
+    setIsModalOpen(true);
   };
 
   const filteredPesanan = useMemo(() => {
@@ -72,13 +83,8 @@ export const usePesananMasuk = () => {
 
     return pesananList.filter((p) => {
       let matchesTab = false;
-
       if (activeTab === "Semua") {
         matchesTab = true;
-      } else if (activeTab === "Diproses") {
-        matchesTab = p.status === "Diproses";
-      } else if (activeTab === "Selesai") {
-        matchesTab = p.status === "Selesai";
       } else {
         matchesTab = p.status === activeTab;
       }
@@ -104,7 +110,7 @@ export const usePesananMasuk = () => {
   }, [filteredPesanan, currentPage]);
 
   const totalPesanan = pesananList.length;
-  const menungguKonfirmasi = Array.isArray(pesananList)
+  const menungguKonfirmasiCount = Array.isArray(pesananList)
     ? pesananList.filter((p) => p.status === "Menunggu Konfirmasi").length
     : 0;
 
@@ -116,10 +122,15 @@ export const usePesananMasuk = () => {
     currentPage,
     setCurrentPage,
     totalPages,
+    setSelectedPesananId,
     totalPesanan,
-    menungguKonfirmasi,
+    menungguKonfirmasiCount,
     handleUpdateStatus,
     activeTab,
     setActiveTab,
+    isModalOpen,
+    setIsModalOpen,
+    selectedPesananId,
+    openProcessModal,
   };
 };

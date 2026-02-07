@@ -13,10 +13,12 @@ import {
   LuChevronRight,
   LuClock3,
   LuPackageCheck,
+  LuClipboard,
 } from "react-icons/lu";
 import { usePesananMasuk } from "@/hooks/usePesananMasuk";
 import { useState } from "react";
 import ModalResep from "@/app/components/dashboard/apoteker/components/modal/ModalResep";
+import ModalProsesPesanan from "@/app/components/dashboard/apoteker/components/modal/ModalProsesPesanan";
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -35,10 +37,15 @@ export default function PesananMasukPage() {
     setCurrentPage,
     totalPages,
     totalPesanan,
-    menungguKonfirmasi,
+    setSelectedPesananId,
+    menungguKonfirmasiCount,
     handleUpdateStatus,
     activeTab,
     setActiveTab,
+    isModalOpen,
+    setIsModalOpen,
+    selectedPesananId,
+    openProcessModal,
   } = usePesananMasuk();
 
   const [selectedResep, setSelectedResep] = useState<{
@@ -85,7 +92,7 @@ export default function PesananMasukPage() {
         <StatCard
           icon={<LuCircleAlert />}
           label="Menunggu Konfirmasi"
-          value={menungguKonfirmasi}
+          value={menungguKonfirmasiCount}
           color="red"
         />
       </div>
@@ -100,7 +107,7 @@ export default function PesananMasukPage() {
               />
               <input
                 type="text"
-                placeholder="Cari ID Pesanan atau Nama Pasien..."
+                placeholder="Cari ID atau Nama Pasien..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-11 pr-4 py-2.5 bg-gray-50 text-black border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-sm"
@@ -192,20 +199,40 @@ export default function PesananMasukPage() {
                   >
                     <LuEye size={20} />
                   </button>
-                  <button
-                    onClick={() => handleUpdateStatus(pesanan.id, "Diproses")}
-                    className="p-3 cursor-pointer rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
-                    title="Terima Pesanan"
-                  >
-                    <LuCheck size={20} />
-                  </button>
-                  <button
-                    onClick={() => handleUpdateStatus(pesanan.id, "Dibatalkan")}
-                    className="p-3 cursor-pointer rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                    title="Batalkan Pesanan"
-                  >
-                    <LuCircleMinus size={20} />
-                  </button>
+
+                  {activeTab === "Menunggu Konfirmasi" && (
+                    <>
+                      <button
+                        onClick={() =>
+                          handleUpdateStatus(pesanan.id, "Diproses")
+                        }
+                        className="p-3 cursor-pointer rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+                        title="Terima Pesanan"
+                      >
+                        <LuCheck size={20} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleUpdateStatus(pesanan.id, "Dibatalkan")
+                        }
+                        className="p-3 cursor-pointer rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                        title="Batalkan Pesanan"
+                      >
+                        <LuCircleMinus size={20} />
+                      </button>
+                    </>
+                  )}
+
+                  {activeTab === "Diproses" && (
+                    <button
+                      onClick={() => openProcessModal(pesanan.id)}
+                      className="px-4 py-2 cursor-pointer rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-2 text-sm font-semibold"
+                      title="Proses & Selesaikan"
+                    >
+                      <LuClipboard size={18} />
+                      Proses & Selesaikan
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -217,6 +244,19 @@ export default function PesananMasukPage() {
                 namaPasien={selectedResep.nama}
                 tanggal={selectedResep.tanggal}
                 fotoResep={selectedResep.foto}
+              />
+            )}
+
+            {isModalOpen && selectedPesananId && (
+              <ModalProsesPesanan
+                pesananId={selectedPesananId}
+                onClose={() => {
+                  setIsModalOpen(false);
+                  setSelectedPesananId(null);
+                }}
+                onSave={(data) => {
+                  handleUpdateStatus(selectedPesananId, "Selesai", data);
+                }}
               />
             )}
           </div>
