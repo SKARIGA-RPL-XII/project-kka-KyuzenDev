@@ -17,7 +17,7 @@ import {
 } from "react-icons/lu";
 import { usePesananMasuk } from "@/hooks/usePesananMasuk";
 import { useState } from "react";
-import ModalResep from "@/app/components/dashboard/apoteker/components/modal/ModalResep";
+import ModalDetailPesanan from "@/app/components/dashboard/apoteker/components/modal/ModalDetailPesanan";
 import ModalProsesPesanan from "@/app/components/dashboard/apoteker/components/modal/ModalProsesPesanan";
 
 interface StatCardProps {
@@ -48,11 +48,17 @@ export default function PesananMasukPage() {
     openProcessModal,
   } = usePesananMasuk();
 
-  const [selectedResep, setSelectedResep] = useState<{
+  const [selectedDetailPesanan, setselectedDetailPesanan] = useState<{
     keluhan: string;
     nama: string;
     tanggal: string;
     foto: string;
+    orderStatus?: string;
+    namaApoteker?: string | null | undefined;
+    totalHarga?: number | null | undefined;
+    detailObat?:
+      | { nama_obat: string; jumlah: number; subtotal: number }[]
+      | null;
   } | null>(null);
 
   const tabs = [
@@ -118,7 +124,7 @@ export default function PesananMasukPage() {
                 <button
                   key={tab.name}
                   onClick={() => setActiveTab(tab.name)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
+                  className={`flex items-center cursor-pointer gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
                     activeTab === tab.name
                       ? "bg-white text-emerald-600 shadow-sm"
                       : "text-gray-500 hover:text-gray-900"
@@ -185,18 +191,28 @@ export default function PesananMasukPage() {
 
                   <div className="flex gap-2">
                     <button
-                      onClick={() =>
-                        setSelectedResep({
+                      onClick={() => {
+                        console.log("Data pesanan yang dipilih:", pesanan);
+                        setselectedDetailPesanan({
                           nama: pesanan.nama_pasien,
                           tanggal: new Date(pesanan.createdAt).toLocaleString(
                             "id-ID",
                           ),
                           foto: pesanan.foto_resep!,
                           keluhan: pesanan.keluhan,
-                        })
-                      }
+                          namaApoteker: pesanan.nama_apoteker,
+                          totalHarga: pesanan.harga_total
+                            ? Number(pesanan.harga_total)
+                            : 0,
+                          orderStatus: pesanan.status,
+                          detailObat:
+                            typeof pesanan.detail_obat === "string"
+                              ? JSON.parse(pesanan.detail_obat)
+                              : pesanan.detail_obat || [],
+                        });
+                      }}
                       className="p-3 rounded-xl cursor-pointer bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
-                      title="Lihat Resep"
+                      title="Lihat Detail Pesanan"
                     >
                       <LuEye size={20} />
                     </button>
@@ -237,14 +253,18 @@ export default function PesananMasukPage() {
                   </div>
                 </div>
               ))}
-              {selectedResep && (
-                <ModalResep
-                  isOpen={!!selectedResep}
-                  onClose={() => setSelectedResep(null)}
-                  keluhan={selectedResep.keluhan}
-                  namaPasien={selectedResep.nama}
-                  tanggal={selectedResep.tanggal}
-                  fotoResep={selectedResep.foto}
+              {selectedDetailPesanan && (
+                <ModalDetailPesanan
+                  isOpen={!!selectedDetailPesanan}
+                  onClose={() => setselectedDetailPesanan(null)}
+                  keluhan={selectedDetailPesanan.keluhan}
+                  namaPasien={selectedDetailPesanan.nama}
+                  tanggal={selectedDetailPesanan.tanggal}
+                  fotoResep={selectedDetailPesanan.foto}
+                  orderStatus={selectedDetailPesanan.orderStatus}
+                  namaApoteker={selectedDetailPesanan.namaApoteker}
+                  totalHarga={selectedDetailPesanan.totalHarga}
+                  detailObat={selectedDetailPesanan.detailObat}
                 />
               )}
 

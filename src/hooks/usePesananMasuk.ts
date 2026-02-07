@@ -2,12 +2,19 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 
 interface Pesanan {
   id: number;
+  user_id: number;
   nama_pasien: string;
   keluhan: string;
   foto_resep: string | null;
-  total_harga: number;
+  status: string;
   createdAt: string;
-  status: "Menunggu Konfirmasi" | "Diproses" | "Selesai" | "Dibatalkan";
+  nama_apoteker: string | null | undefined;
+  harga_total: number | null | undefined;
+  detail_obat?: Array<{
+    nama_obat: string;
+    jumlah: number;
+    subtotal: number;
+  }>;
 }
 
 export const usePesananMasuk = () => {

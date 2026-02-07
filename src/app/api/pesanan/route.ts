@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const keluhan = formData.get("keluhan") as string;
-    const harga_total = formData.get("total_harga") as string;
+    const harga_total = formData.get("harga_total") as string;
     const foto_resep_file = formData.get("foto_resep") as File | null;
 
     let fotoUrlPath = null;
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     const [result] = await db.execute(
-      "INSERT INTO pesanan (user_id, keluhan, foto_resep, harga_total) VALUES (?, ?, ?, ?)",
+      "INSERT INTO pesanan (user_id, keluhan, foto_resep, harga_total, status) VALUES (?, ?, ?, ?, 'Menunggu Konfirmasi')",
       [userId, keluhan, fotoUrlPath, harga_total || 0],
     );
 
@@ -73,10 +73,26 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
 
     let query = `
-      SELECT p.*, u.nama as nama_pasien 
-      FROM pesanan p
-      JOIN user u ON p.user_id = u.id
-    `;
+  SELECT 
+    p.*, 
+    u.nama as nama_pasien,
+    a.nama as nama_apoteker,
+    (
+      SELECT JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'nama_obat', o.nama_obat,
+          'jumlah', dp.jumlah,
+          'subtotal', dp.subtotal
+        )
+      )
+      FROM detail_pesanan dp
+      JOIN obat o ON dp.obat_id = o.id
+      WHERE dp.pesanan_id = p.id
+    ) as detail_obat
+  FROM pesanan p
+  JOIN user u ON p.user_id = u.id
+  LEFT JOIN user a ON p.apoteker_id = a.id
+`;
     const queryParams = [];
 
     if (status && status !== "Semua") {

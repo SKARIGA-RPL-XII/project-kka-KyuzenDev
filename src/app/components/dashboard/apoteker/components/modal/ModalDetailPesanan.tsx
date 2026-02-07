@@ -6,30 +6,38 @@ import {
   LuImageOff,
 } from "react-icons/lu";
 
-interface ModalResepProps {
+interface ModalDetailPesananProps {
   isOpen: boolean;
   onClose: () => void;
+  keluhan: string;
   namaPasien: string;
   tanggal: string;
-  keluhan: string;
-  fotoResep: string | null;
+  orderStatus?: string;
+  fotoResep: string;
+  namaApoteker?: string | null;
+  totalHarga?: number | string | null;
+  detailObat?: { nama_obat: string; jumlah: number; subtotal: number }[] | null;
 }
 
-export default function ModalResep({
+export default function ModalDetailPesanan({
   isOpen,
   onClose,
   namaPasien,
   tanggal,
   keluhan,
   fotoResep,
-}: ModalResepProps) {
+  orderStatus,
+  namaApoteker,
+  totalHarga,
+  detailObat,
+}: ModalDetailPesananProps) {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
       <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[90vh]">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-900">Detail Resep</h2>
+          <h2 className="text-xl font-bold text-gray-900">Detail Pesanan</h2>
         </div>
 
         <div className="p-6 overflow-y-auto flex-grow space-y-4">
@@ -90,6 +98,43 @@ export default function ModalResep({
               </div>
             )}
           </div>
+          {namaApoteker && (
+            <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
+              <p className="text-sm text-emerald-800 font-medium">
+                Diproses oleh:
+              </p>
+              <p className="text-lg font-bold text-emerald-950">
+                {namaApoteker}
+              </p>
+            </div>
+          )}
+
+          {detailObat && detailObat.length > 0 && (
+            <div className="border border-gray-100 rounded-xl p-4">
+              <h4 className="font-semibold text-gray-700 mb-2">Daftar Obat</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                {detailObat.map((obat, index) => (
+                  <li key={index} className="flex justify-between">
+                    <span>
+                      {obat.nama_obat} (x{obat.jumlah})
+                    </span>
+                    <span className="font-medium">
+                      Rp{obat.subtotal.toLocaleString("id-ID")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {totalHarga !== undefined && orderStatus === "Selesai" && (
+            <div className="flex justify-between items-center bg-gray-900 text-white p-4 rounded-xl mt-4">
+              <span className="font-medium">Total Harga</span>
+              <span className="text-xl font-bold">
+                Rp{Number(totalHarga).toLocaleString("id-ID")}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="p-6 border-t border-gray-100 flex justify-end">
