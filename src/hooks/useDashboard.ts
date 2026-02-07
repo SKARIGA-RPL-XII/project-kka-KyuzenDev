@@ -79,6 +79,7 @@ export function useDashboard() {
   const isStokPage = pathname.includes("/stok");
   const isStatsPage = pathname.includes("/stats");
   const isUsersPage = pathname.includes("/users");
+  const isPesananMasukPage = pathname.includes("/pesanan-masuk");
 
   return {
     user,
@@ -91,6 +92,7 @@ export function useDashboard() {
     isStatsPage,
     isUsersPage,
     isStokPage,
+    isPesananMasukPage,
     router,
   };
 }

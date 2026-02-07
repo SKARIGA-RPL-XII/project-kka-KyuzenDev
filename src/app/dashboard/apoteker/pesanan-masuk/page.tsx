@@ -68,7 +68,7 @@ export default function PesananMasukPage() {
     { name: "Selesai", icon: LuPackageCheck },
   ];
   return (
-    <div className="space-y-8 bg-[#f8fafc] min-h-screen text-black p-6">
+    <div className="space-y-8 bg-[#f8fafc] min-h-screen text-black">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Link
