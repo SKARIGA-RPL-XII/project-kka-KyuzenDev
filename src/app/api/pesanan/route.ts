@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const keluhan = formData.get("keluhan") as string;
-    const harga_total = formData.get("harga_total") as string;
+    const harga_total = formData.get("total_harga") as string;
     const foto_resep_file = formData.get("foto_resep") as File | null;
 
     let fotoUrlPath = null;
