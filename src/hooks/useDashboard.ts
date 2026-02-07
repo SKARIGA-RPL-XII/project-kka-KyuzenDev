@@ -25,7 +25,7 @@ export function useDashboard() {
         try {
           setUser(JSON.parse(storedData));
         } catch (error) {
-            console.error("Failed to parse user data", error);
+          console.error("Failed to parse user data", error);
           router.push("/auth/login");
         }
       } else {
@@ -55,16 +55,31 @@ export function useDashboard() {
     };
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    router.push("/auth/login");
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        router.push("/auth/login");
+        router.refresh();
+      } else {
+        console.error("Gagal melakukan logout");
+      }
+    } catch (error) {
+      console.error("Terjadi kesalahan saat logout:", error);
+    }
   };
 
   const isProfilePage = pathname.includes("/profil");
   const isStokPage = pathname.includes("/stok");
   const isStatsPage = pathname.includes("/stats");
   const isUsersPage = pathname.includes("/users");
-  
+
   return {
     user,
     isMounted,

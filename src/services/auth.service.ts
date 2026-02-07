@@ -58,7 +58,6 @@ export class AuthService {
     if (!isPasswordValid) throw new Error("Email atau password salah");
 
     let imageBase64 = null;
-
     if (user.photo_profile && Buffer.isBuffer(user.photo_profile)) {
       imageBase64 = `data:image/jpeg;base64,${user.photo_profile.toString("base64")}`;
     } else if (typeof user.photo_profile === "string") {
