@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const keluhan = formData.get("keluhan") as string;
-    const total_harga = formData.get("total_harga") as string;
+    const harga_total = formData.get("harga_total") as string;
     const foto_resep_file = formData.get("foto_resep") as File | null;
 
     let fotoUrlPath = null;
@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
     }
 
     const [result] = await db.execute(
-      "INSERT INTO pesanan (user_id, keluhan, foto_resep, total_harga) VALUES (?, ?, ?, ?)",
-      [userId, keluhan, fotoUrlPath, total_harga || 0],
+      "INSERT INTO pesanan (user_id, keluhan, foto_resep, harga_total) VALUES (?, ?, ?, ?)",
+      [userId, keluhan, fotoUrlPath, harga_total || 0],
     );
 
     return NextResponse.json(
