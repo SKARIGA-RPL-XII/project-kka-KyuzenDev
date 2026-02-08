@@ -21,24 +21,24 @@ export default function ApotekerPage() {
       else router.push("/auth/login");
     }
   }, [router]);
-useEffect(() => {
-  const fetchPendingOrdersCount = async () => {
-    try {
-      const response = await fetch("/api/pesanan/count?status=pending");
-      if (response.ok) {
-        const data = await response.json();
-        setPendingCount(data.count);
+  useEffect(() => {
+    const fetchPendingOrdersCount = async () => {
+      try {
+        const response = await fetch("/api/pesanan/count?status=pending");
+        if (response.ok) {
+          const data = await response.json();
+          setPendingCount(data.count);
+        }
+      } catch (error) {
+        console.error("Gagal mengambil jumlah pesanan", error);
       }
-    } catch (error) {
-      console.error("Gagal mengambil jumlah pesanan", error);
-    }
-  };
+    };
 
-  fetchPendingOrdersCount();
+    fetchPendingOrdersCount();
 
-  const interval = setInterval(fetchPendingOrdersCount, 30000);
-  return () => clearInterval(interval);
-}, []);
+    const interval = setInterval(fetchPendingOrdersCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <Link href="/dashboard/apoteker/stok">
@@ -68,7 +68,7 @@ useEffect(() => {
       <Link href="/dashboard/apoteker/pesanan-masuk">
         <div className="relative bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-emerald-100 hover:border-emerald-400 hover:shadow-md transition-all group">
           {pendingCount > 0 && (
-            <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold">
+            <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold animate-bounce">
               {pendingCount > 99 ? "99+" : pendingCount}
             </span>
           )}
