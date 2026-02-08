@@ -38,12 +38,26 @@ export default function RiwayatModal({
     if (typeof detail === "string") {
       try {
         return JSON.parse(detail) as ObatItem[];
-      } catch (e) {
-        console.error("Gagal parse detail_obat JSON string", e);
+      } catch {
         return [];
       }
     }
     return detail;
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Menunggu Konfirmasi":
+        return "bg-yellow-50 text-yellow-700 border-yellow-200";
+      case "Diproses":
+        return "bg-blue-50 text-blue-700 border-blue-200";
+      case "Siap Di Ambil":
+        return "bg-green-50 text-green-700 border-green-200";
+      case "Dibatalkan":
+        return "bg-red-50 text-red-700 border-red-200";
+      default:
+        return "bg-slate-50 text-slate-700 border-slate-200";
+    }
   };
 
   return (
@@ -104,9 +118,11 @@ export default function RiwayatModal({
                           )}
                         </div>
                       </div>
-                      <span className="text-xs bg-sky-50 text-sky-700 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
+                      <span
+                        className={`text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1 ${getStatusColor(pesanan.status)}`}
+                      >
                         <LuUser size={14} />
-                        {pesanan.nama_apoteker || "Menunggu..."}
+                        {pesanan.status}
                       </span>
                     </div>
 

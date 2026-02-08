@@ -11,12 +11,15 @@ import Link from "next/link";
 import { useOrder } from "@/hooks/useOrder";
 import OrderModal from "@/app/components/dashboard/pasien/components/modal/OrderModal";
 import RiwayatModal from "@/app/components/dashboard/pasien/components/modal/RiwayatModal";
+import { Pesanan } from "@/types/pesanan";
+
 export default function PasienPage() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { placeOrder, loading } = useOrder();
   const [isRiwayatOpen, setIsRiwayatOpen] = useState(false);
-  const [dataRiwayat, setDataRiwayat] = useState([]);
+  const [dataRiwayat, setDataRiwayat] = useState<Pesanan[]>([]);
+  const [unreadNotif, setUnreadNotif] = useState(0);
 
   const handleOrderSubmit = async (data: {
     keluhan: string;
@@ -30,28 +33,63 @@ export default function PasienPage() {
       });
       alert("Pesanan berhasil dikirim!");
       setIsModalOpen(false);
+      // --- Setelah pesan obat, perbarui notifikasi ---
+      fetchRiwayatNotif();
     } catch (err) {
       alert(
         `Gagal: ${err instanceof Error ? err.message : "Terjadi kesalahan"}`,
       );
     }
   };
-  const fetchRiwayat = async () => {
-    try {
-      const response = await fetch(`/api/pesanan?status=Selesai`);
-      const result = await response.json();
 
+  // Fungsi untuk membuka modal dan mengambil data
+const handleOpenRiwayat = async () => {
+  try {
+    const response = await fetch(`/api/riwayat`);
+    const result = await response.json();
+
+    if (response.ok) {
+      setDataRiwayat(result.data);
+
+      // --- TAMBAHKAN LOGIKA INI ---
+      if (result.unreadCount > 0) {
+        // Panggil API PATCH untuk ubah status di DB
+        await fetch("/api/riwayat", { method: "PATCH" });
+        // Update state jadi 0 agar badge hilang
+        setUnreadNotif(0);
+      }
+      // -----------------------------
+
+      setIsRiwayatOpen(true);
+    } else {
+      throw new Error(result.error || "Gagal mengambil data");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Gagal mengambil data riwayat");
+  }
+};
+
+  // Fungsi khusus untuk memperbarui jumlah notif di card (dipanggil di useEffect)
+  const fetchRiwayatNotif = async () => {
+    try {
+      const response = await fetch(`/api/riwayat`);
+      const result = await response.json();
       if (response.ok) {
-        setDataRiwayat(result.data);
-        setIsRiwayatOpen(true);
-      } else {
-        throw new Error(result.error || "Gagal mengambil data");
+        // --- PERBAIKAN: Pastikan result.unreadCount ada ---
+        setUnreadNotif(result.unreadCount || 0);
       }
     } catch (error) {
-      console.error(error);
-      alert("Gagal mengambil data riwayat");
+      console.error("Gagal mengambil notifikasi:", error);
     }
   };
+
+  // Cek notif saat komponen dimuat
+  useEffect(() => {
+    fetchRiwayatNotif();
+  }, []);
+
+  // Cek role user
   useEffect(() => {
     if (typeof window !== "undefined") {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -67,9 +105,17 @@ export default function PasienPage() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div
-        onClick={fetchRiwayat}
-        className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-blue-100 hover:border-blue-400 hover:shadow-md transition-all group"
+        onClick={handleOpenRiwayat} // --- PERBAIKAN: Gunakan fungsi baru ---
+        className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-blue-100 hover:border-blue-400 hover:shadow-md transition-all group relative"
       >
+        {/* --- LABEL NOTIFIKASI --- */}
+        {unreadNotif > 0 && (
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-bounce">
+            {unreadNotif}
+          </span>
+        )}
+        {/* ------------------------- */}
+
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-5">
             <div className="p-4 bg-blue-50 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
@@ -90,6 +136,8 @@ export default function PasienPage() {
           />
         </div>
       </div>
+
+      {/* Card lainnya tetap sama */}
       <div
         onClick={() => setIsModalOpen(true)}
         className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-blue-100 hover:border-blue-400 hover:shadow-md transition-all group"
@@ -137,6 +185,7 @@ export default function PasienPage() {
           </div>
         </div>
       </Link>
+
       <RiwayatModal
         isOpen={isRiwayatOpen}
         onClose={() => setIsRiwayatOpen(false)}

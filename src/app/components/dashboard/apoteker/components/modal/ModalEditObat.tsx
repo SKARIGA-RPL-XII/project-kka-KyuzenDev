@@ -42,7 +42,7 @@ export default function ModalEditObat({
     try {
 
       const response = await fetch(`/api/obat/${obat.id}`, {
-        method: "PUT",
+  
         headers: {
           "Content-Type": "application/json",
         },
@@ -59,7 +59,7 @@ export default function ModalEditObat({
     } finally {
       setLoading(false);
     }
-  };
+      
 
   if (!isOpen) return null;
 

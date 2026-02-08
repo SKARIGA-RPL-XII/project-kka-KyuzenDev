@@ -71,7 +71,11 @@ export async function GET(request: NextRequest) {
       id: number;
       role: string;
     };
-    const currentUserId = decoded.id;
+
+    // Pastikan yang mengakses bukan pasien
+    if (decoded.role === "pasien") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -96,14 +100,18 @@ export async function GET(request: NextRequest) {
       FROM pesanan p
       JOIN user u ON p.user_id = u.id
       LEFT JOIN user a ON p.apoteker_id = a.id
-      WHERE p.user_id = ?
+      WHERE 1=1
     `;
 
-    const queryParams: (string | number)[] = [currentUserId];
+    const queryParams: (string | number)[] = [];
 
+    // Apoteker biasanya melihat pesanan yang belum selesai
     if (status && status !== "Semua") {
       query += ` AND p.status = ?`;
       queryParams.push(status);
+    } else {
+      // Default filter jika tidak ada status (opsional, sesuaikan kebutuhan)
+      query += ` AND p.status != 'Selesai'`;
     }
 
     query += ` ORDER BY p.createdAt DESC`;
@@ -112,13 +120,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: rows }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching orders:", error);
-
-    // Penanganan error JWT atau database
-    if (error instanceof jwt.JsonWebTokenError) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
+    console.error("Error fetching incoming orders:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
