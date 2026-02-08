@@ -10,11 +10,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useOrder } from "@/hooks/useOrder";
 import OrderModal from "@/app/components/dashboard/pasien/components/modal/OrderModal";
-
+import RiwayatModal from "@/app/components/dashboard/pasien/components/modal/RiwayatModal";
 export default function PasienPage() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { placeOrder, loading } = useOrder();
+  const [isRiwayatOpen, setIsRiwayatOpen] = useState(false);
+  const [dataRiwayat, setDataRiwayat] = useState([]);
 
   const handleOrderSubmit = async (data: {
     keluhan: string;
@@ -34,7 +36,22 @@ export default function PasienPage() {
       );
     }
   };
+  const fetchRiwayat = async () => {
+    try {
+      const response = await fetch(`/api/pesanan?status=Selesai`);
+      const result = await response.json();
 
+      if (response.ok) {
+        setDataRiwayat(result.data);
+        setIsRiwayatOpen(true);
+      } else {
+        throw new Error(result.error || "Gagal mengambil data");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Gagal mengambil data riwayat");
+    }
+  };
   useEffect(() => {
     if (typeof window !== "undefined") {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -49,15 +66,18 @@ export default function PasienPage() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-blue-100 hover:border-blue-400 hover:shadow-md transition-all group">
+      <div
+        onClick={fetchRiwayat}
+        className="bg-white p-8 rounded-xl shadow-sm cursor-pointer border border-blue-100 hover:border-blue-400 hover:shadow-md transition-all group"
+      >
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-5">
             <div className="p-4 bg-blue-50 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
               <LuHistory size={32} />
             </div>
             <div>
-              <h3 className="font-bold text-xl mb-1 text-gray-800 group-hover:text-blue-600 transition-colors">
-                Riwayat Resep
+              <h3 className="font-bold text-lg mb-1 text-gray-800 group-hover:text-blue-600 transition-colors">
+                Riwayat Pembelian
               </h3>
               <p className="text-gray-500 text-sm">
                 Lihat daftar obat yang pernah dibeli.
@@ -117,7 +137,11 @@ export default function PasienPage() {
           </div>
         </div>
       </Link>
-
+      <RiwayatModal
+        isOpen={isRiwayatOpen}
+        onClose={() => setIsRiwayatOpen(false)}
+        data={dataRiwayat}
+      />
       <OrderModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

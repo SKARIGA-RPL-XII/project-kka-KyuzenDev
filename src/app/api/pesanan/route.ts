@@ -67,36 +67,42 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET as string);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id: number;
+      role: string;
+    };
+    const currentUserId = decoded.id;
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
 
     let query = `
-  SELECT 
-    p.*, 
-    u.nama as nama_pasien,
-    a.nama as nama_apoteker,
-    (
-      SELECT JSON_ARRAYAGG(
-        JSON_OBJECT(
-          'nama_obat', o.nama_obat,
-          'jumlah', dp.jumlah,
-          'subtotal', dp.subtotal
-        )
-      )
-      FROM detail_pesanan dp
-      JOIN obat o ON dp.obat_id = o.id
-      WHERE dp.pesanan_id = p.id
-    ) as detail_obat
-  FROM pesanan p
-  JOIN user u ON p.user_id = u.id
-  LEFT JOIN user a ON p.apoteker_id = a.id
-`;
-    const queryParams = [];
+      SELECT 
+        p.*, 
+        u.nama as nama_pasien,
+        a.nama as nama_apoteker,
+        (
+          SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'nama_obat', o.nama_obat,
+              'jumlah', dp.jumlah,
+              'subtotal', dp.subtotal
+            )
+          )
+          FROM detail_pesanan dp
+          JOIN obat o ON dp.obat_id = o.id
+          WHERE dp.pesanan_id = p.id
+        ) as detail_obat
+      FROM pesanan p
+      JOIN user u ON p.user_id = u.id
+      LEFT JOIN user a ON p.apoteker_id = a.id
+      WHERE p.user_id = ?
+    `;
+
+    const queryParams: (string | number)[] = [currentUserId];
 
     if (status && status !== "Semua") {
-      query += ` WHERE p.status = ?`;
+      query += ` AND p.status = ?`;
       queryParams.push(status);
     }
 
@@ -107,6 +113,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ data: rows }, { status: 200 });
   } catch (error) {
     console.error("Error fetching orders:", error);
+
+    // Penanganan error JWT atau database
+    if (error instanceof jwt.JsonWebTokenError) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

@@ -11,7 +11,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verifikasi token untuk mendapatkan apoteker_id
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       id: number;
     };
