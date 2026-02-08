@@ -72,7 +72,6 @@ export async function GET(request: NextRequest) {
       role: string;
     };
 
-    // Pastikan yang mengakses bukan pasien
     if (decoded.role === "pasien") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -104,15 +103,6 @@ export async function GET(request: NextRequest) {
     `;
 
     const queryParams: (string | number)[] = [];
-
-    // Apoteker biasanya melihat pesanan yang belum selesai
-    if (status && status !== "Semua") {
-      query += ` AND p.status = ?`;
-      queryParams.push(status);
-    } else {
-      // Default filter jika tidak ada status (opsional, sesuaikan kebutuhan)
-      query += ` AND p.status != 'Selesai'`;
-    }
 
     query += ` ORDER BY p.createdAt DESC`;
 

@@ -138,14 +138,14 @@ export default function StokPage() {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50"
+                className="px-4 py-2 cursor-pointer bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50"
               >
                 Prev
               </button>
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50"
+                className="px-4 py-2 cursor-pointer bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50"
               >
                 Next
               </button>

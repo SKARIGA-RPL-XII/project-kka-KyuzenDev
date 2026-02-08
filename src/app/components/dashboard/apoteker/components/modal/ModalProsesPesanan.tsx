@@ -2,7 +2,7 @@
 
 import { LuX, LuPlus, LuTrash2, LuPackage, LuLoader } from "react-icons/lu";
 import { useProsesPesanan } from "@/hooks/useProsesPesanan";
-onSave(getPayload());
+
 interface ModalProsesPesananProps {
   pesananId: number;
   onClose: () => void;

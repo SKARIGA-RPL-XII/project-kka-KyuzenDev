@@ -21,7 +21,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
 
-    // --- QUERY DATA PESANAN ---
     let query = `
       SELECT 
         p.id,
@@ -57,7 +56,6 @@ export async function GET(request: NextRequest) {
     const queryParams: (string | number)[] = [currentUserId];
 
     if (status) {
-      // Jika frontend memfilter 'Siap Di Ambil', SQL mencari status asli 'Selesai'
       if (status === "Siap Di Ambil") {
         query += ` AND p.status = 'Selesai'`;
       } else {
@@ -70,8 +68,6 @@ export async function GET(request: NextRequest) {
 
     const [rows] = await db.execute(query, queryParams);
 
-    // --- QUERY HITUNG NOTIFIKASI ---
-    // Hitung berapa banyak pesanan yang berstatus 'Selesai' (label: "Siap Di Ambil")
     const notifQuery = `
       SELECT COUNT(*) as unreadCount
       FROM pesanan
@@ -82,7 +78,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         data: rows,
-        unreadCount: unreadCount, // Kirim jumlah notifikasi ke frontend
+        unreadCount: unreadCount,
       },
       { status: 200 },
     );
@@ -106,9 +102,6 @@ export async function PATCH(request: NextRequest) {
       id: number;
     };
     const currentUserId = decoded.id;
-
-    // LOGIKA: Ubah status dari 'Selesai' menjadi 'Diambil'
-    // Sehingga tidak terhitung lagi sebagai notifikasi
     const updateQuery = `
       UPDATE pesanan 
       SET status = 'Diambil' 

@@ -1,5 +1,11 @@
 "use client";
-import { LuX, LuPackage, LuPill, LuCalendarDays, LuUser } from "react-icons/lu";
+import {
+  LuX,
+  LuPackage,
+  LuPill,
+  LuCalendarDays,
+  LuStethoscope,
+} from "react-icons/lu";
 
 interface ObatItem {
   jumlah: number;
@@ -119,9 +125,10 @@ export default function RiwayatModal({
                         </div>
                       </div>
                       <span
-                        className={`text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1 ${getStatusColor(pesanan.status)}`}
+                        className={`text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1 ${getStatusColor(
+                          pesanan.status,
+                        )}`}
                       >
-                        <LuUser size={14} />
                         {pesanan.status}
                       </span>
                     </div>
@@ -157,6 +164,18 @@ export default function RiwayatModal({
                           </p>
                         )}
                       </div>
+
+                      {/* --- TAMBAHKAN BAGIAN INI UNTUK NAMA APOTEKER --- */}
+                      {pesanan.nama_apoteker && (
+                        <div className="flex items-center gap-2 text-sm text-slate-600 bg-sky-50/50 p-3 rounded-xl border border-sky-100">
+                          <LuStethoscope size={16} className="text-sky-500" />
+                          <span className="font-medium">Petugas Apotek:</span>
+                          <span className="text-sky-800 font-semibold">
+                            {pesanan.nama_apoteker}
+                          </span>
+                        </div>
+                      )}
+                      {/* ----------------------------------------------- */}
                     </div>
 
                     <div className="flex justify-between items-center pt-4 border-t border-slate-100 mt-auto">

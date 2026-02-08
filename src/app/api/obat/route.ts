@@ -15,7 +15,8 @@ export async function GET() {
     await connection.end();
 
     return NextResponse.json(rows);
-  } catch {
+  } catch (error) {
+    console.error("Database error:", error);
     return NextResponse.json(
       { error: "Gagal mengambil data" },
       { status: 500 },
