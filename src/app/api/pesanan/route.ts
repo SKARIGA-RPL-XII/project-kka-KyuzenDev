@@ -76,9 +76,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
-
     let query = `
       SELECT 
         p.*, 
