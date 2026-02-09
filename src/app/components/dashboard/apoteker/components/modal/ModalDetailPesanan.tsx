@@ -127,7 +127,7 @@ export default function ModalDetailPesanan({
             </div>
           )}
 
-          {totalHarga !== undefined && orderStatus === "Selesai" && (
+          {totalHarga !== undefined && (orderStatus === "Selesai" || orderStatus === "Diambil") && (
             <div className="flex justify-between items-center bg-gray-900 text-white p-4 rounded-xl mt-4">
               <span className="font-medium">Total Harga</span>
               <span className="text-xl font-bold">
