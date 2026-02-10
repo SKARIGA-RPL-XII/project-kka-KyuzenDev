@@ -67,7 +67,7 @@ export default function OrderModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 backdrop-blur-sm bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl animate-in fade-in zoom-in duration-200">
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-bold text-gray-800">Form Pesan Obat</h2>
