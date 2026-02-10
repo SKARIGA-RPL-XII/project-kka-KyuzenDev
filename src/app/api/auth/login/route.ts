@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const result = await AuthService.login(body);
-
+    const userRole = result.user.role;
     const response = NextResponse.json(
       { message: "Login berhasil", user: result.user },
       { status: 200 },
@@ -19,9 +19,15 @@ export async function POST(request: Request) {
       path: "/",
     });
 
+    response.cookies.set("role", userRole, {
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+
     return response;
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "An error occurred";
+    const message =
+      error instanceof Error ? error.message : "An error occurred";
     return NextResponse.json({ error: message }, { status: 401 });
   }
 }

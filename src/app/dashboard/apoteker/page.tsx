@@ -8,19 +8,26 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 export default function ApotekerPage() {
   const router = useRouter();
   const [pendingCount, setPendingCount] = useState(0);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    if (user.role !== "Apoteker") {
-      if (user.role === "Admin") router.replace("/dashboard/admin");
-      else if (user.role === "Pasien") router.replace("/dashboard/pasien");
-      else router.push("/auth/login");
+    const role = Cookies.get("role");
+
+    if (!role || role !== "Apoteker") {
+      router.replace(role ? `/dashboard/${role.toLowerCase()}` : "/auth/login");
+      return;
     }
+
+    setTimeout(() => {
+      setIsPageLoading(false);
+    }, 0);
   }, [router]);
+
   useEffect(() => {
     const fetchPendingOrdersCount = async () => {
       try {
@@ -39,6 +46,18 @@ export default function ApotekerPage() {
     const interval = setInterval(fetchPendingOrdersCount, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  if (isPageLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="font-medium text-gray-500">Memuat data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <Link href="/dashboard/apoteker/stok">

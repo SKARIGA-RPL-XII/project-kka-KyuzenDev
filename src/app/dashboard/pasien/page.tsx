@@ -5,93 +5,35 @@ import {
   LuUser,
   LuChevronRight,
 } from "react-icons/lu";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useOrder } from "@/hooks/useOrder";
 import OrderModal from "@/app/components/dashboard/pasien/components/modal/OrderModal";
 import RiwayatModal from "@/app/components/dashboard/pasien/components/modal/RiwayatModal";
-import { Pesanan } from "@/types/pesanan";
+import { usePasien } from "@/hooks/usePasien";
 
 export default function PasienPage() {
-  const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { placeOrder, loading } = useOrder();
-  const [isRiwayatOpen, setIsRiwayatOpen] = useState(false);
-  const [dataRiwayat, setDataRiwayat] = useState<Pesanan[]>([]);
-  const [unreadNotif, setUnreadNotif] = useState(0);
+  const {
+    isModalOpen,
+    setIsModalOpen,
+    isRiwayatOpen,
+    setIsRiwayatOpen,
+    dataRiwayat,
+    unreadNotif,
+    orderLoading,
+    handleOrderSubmit,
+    handleOpenRiwayat,
+    isPageLoading,
+  } = usePasien();
 
-  const handleOrderSubmit = async (data: {
-    keluhan: string;
-    foto_resep: File | null;
-  }) => {
-    try {
-      await placeOrder({
-        keluhan: data.keluhan,
-        total_harga: 0,
-        foto_resep: data.foto_resep,
-      });
-      alert("Pesanan berhasil dikirim!");
-      setIsModalOpen(false);
-      fetchRiwayatNotif();
-    } catch (err) {
-      alert(
-        `Gagal: ${err instanceof Error ? err.message : "Terjadi kesalahan"}`,
-      );
-    }
-  };
-
-  const handleOpenRiwayat = async () => {
-    try {
-      const response = await fetch(`/api/riwayat`);
-      const result = await response.json();
-
-      if (response.ok) {
-        setDataRiwayat(result.data);
-
-        if (result.unreadCount > 0) {
-          await fetch("/api/riwayat", { method: "PATCH" });
-          setUnreadNotif(0);
-        }
-
-        setIsRiwayatOpen(true);
-      } else {
-        throw new Error(result.error || "Gagal mengambil data");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Gagal mengambil data riwayat");
-    }
-  };
-
-  const fetchRiwayatNotif = async () => {
-    try {
-      const response = await fetch(`/api/riwayat`);
-      const result = await response.json();
-      if (response.ok) {
-        setUnreadNotif(result.unreadCount || 0);
-      }
-    } catch (error) {
-      console.error("Gagal mengambil notifikasi:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchRiwayatNotif();
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      if (user.role !== "Pasien") {
-        if (user.role === "Admin") router.replace("/dashboard/admin");
-        else if (user.role === "Apoteker")
-          router.replace("/dashboard/apoteker");
-        else router.push("/auth/login");
-      }
-    }
-  }, [router]);
-
+  if (isPageLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="font-medium text-gray-500">Memuat data...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div
@@ -139,7 +81,9 @@ export default function PasienPage() {
                 Pesan Obat
               </h3>
               <p className="text-gray-500 text-sm">
-                {loading ? "Memproses..." : "Cari dan pesan obat dari apotek."}
+                {orderLoading
+                  ? "Memproses..."
+                  : "Cari dan pesan obat dari apotek."}
               </p>
             </div>
           </div>
@@ -182,7 +126,7 @@ export default function PasienPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleOrderSubmit}
-        loading={loading}
+        loading={orderLoading}
       />
     </div>
   );
