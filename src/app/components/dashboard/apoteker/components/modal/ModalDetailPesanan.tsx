@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useState } from "react";
 import {
   LuCalendarDays,
   LuUser,
@@ -31,6 +32,8 @@ export default function ModalDetailPesanan({
   totalHarga,
   detailObat,
 }: ModalDetailPesananProps) {
+  const [imageError, setImageError] = useState(false);
+  
   if (!isOpen) return null;
 
   return (
@@ -80,7 +83,7 @@ export default function ModalDetailPesanan({
               Foto Resep:
             </p>
 
-            {fotoResep ? (
+            {fotoResep && !imageError ? (
               <div className="border border-gray-200 rounded-2xl p-2 bg-gray-50">
                 <Image
                   src={fotoResep}
@@ -88,6 +91,8 @@ export default function ModalDetailPesanan({
                   width={600}
                   height={400}
                   className="w-full h-auto rounded-xl object-contain max-h-[400px]"
+                  unoptimized
+                  onError={() => setImageError(true)}
                 />
               </div>
             ) : (

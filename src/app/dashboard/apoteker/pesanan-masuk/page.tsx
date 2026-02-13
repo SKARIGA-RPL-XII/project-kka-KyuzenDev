@@ -192,13 +192,19 @@ export default function PesananMasukPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
-                        console.log("Data pesanan yang dipilih:", pesanan);
+                        let fotoPath = '';
+                        if (pesanan.foto_resep && typeof pesanan.foto_resep === 'object' && pesanan.foto_resep.data) {
+                          fotoPath = String.fromCharCode(...pesanan.foto_resep.data);
+                        } else if (typeof pesanan.foto_resep === 'string') {
+                          fotoPath = pesanan.foto_resep;
+                        }
+                        
                         setselectedDetailPesanan({
                           nama: pesanan.nama_pasien,
                           tanggal: new Date(pesanan.createdAt).toLocaleString(
                             "id-ID",
                           ),
-                          foto: pesanan.foto_resep!,
+                          foto: fotoPath,
                           keluhan: pesanan.keluhan,
                           namaApoteker: pesanan.nama_apoteker,
                           totalHarga: pesanan.harga_total
