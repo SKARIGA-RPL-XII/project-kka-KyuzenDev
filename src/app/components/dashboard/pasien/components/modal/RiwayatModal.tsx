@@ -22,6 +22,7 @@ interface Pesanan {
   createdAt: string;
   harga_total: number | string;
   nama_apoteker?: string | null;
+  konsultasi_apoteker?: string | null;
   detail_obat?: ObatItem[] | string | null;
 }
 
@@ -164,8 +165,6 @@ export default function RiwayatModal({
                           </p>
                         )}
                       </div>
-
-                      {/* --- TAMBAHKAN BAGIAN INI UNTUK NAMA APOTEKER --- */}
                       {pesanan.nama_apoteker && (
                         <div className="flex items-center gap-2 text-sm text-slate-600 bg-sky-50/50 p-3 rounded-xl border border-sky-100">
                           <LuStethoscope size={16} className="text-sky-500" />
@@ -175,7 +174,12 @@ export default function RiwayatModal({
                           </span>
                         </div>
                       )}
-                      {/* ----------------------------------------------- */}
+                      {pesanan.konsultasi_apoteker && (
+                        <div className="flex flex-col gap-1 text-sm text-slate-600 bg-sky-50/50 p-3 rounded-xl border border-sky-100">
+                          <span className="font-medium">Catatan:</span>
+                          <span className="text-sky-800">{pesanan.konsultasi_apoteker}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex justify-between items-center pt-4 border-t border-slate-100 mt-auto">

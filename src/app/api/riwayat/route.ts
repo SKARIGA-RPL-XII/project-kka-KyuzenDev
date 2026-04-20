@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         p.createdAt,
         p.harga_total,
         p.apoteker_id,
-        -- LOGIKA UBAH STATUS DI SINI
+        p.konsultasi_apoteker,
         CASE 
           WHEN p.status = 'Selesai' THEN 'Siap Di Ambil'
           ELSE p.status

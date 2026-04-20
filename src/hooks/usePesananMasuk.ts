@@ -5,7 +5,7 @@ interface Pesanan {
   user_id: number;
   nama_pasien: string;
   keluhan: string;
-  foto_resep: string | null;
+  foto_resep: { type: string; data: number[] } | string | null;
   status: string;
   createdAt: string;
   nama_apoteker: string | null | undefined;
