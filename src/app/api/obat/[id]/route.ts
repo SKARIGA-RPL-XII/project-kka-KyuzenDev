@@ -16,6 +16,18 @@ export async function DELETE(
       );
     }
 
+    const [used] = await db.execute<ResultSetHeader[]>(
+      "SELECT id FROM detail_pesanan WHERE obat_id = ? LIMIT 1",
+      [id],
+    );
+
+    if ((used as unknown[]).length > 0) {
+      return NextResponse.json(
+        { message: "Obat tidak dapat dihapus karena sudah digunakan dalam pesanan" },
+        { status: 409 },
+      );
+    }
+
     const query = "DELETE FROM obat WHERE id = ?";
     const [result] = await db.execute<ResultSetHeader>(query, [id]);
 

@@ -39,7 +39,11 @@ export function useObatLogic(data: Obat[], refreshData: () => Promise<void>) {
         method: "DELETE",
       });
 
-      if (!response.ok) throw new Error("Gagal menghapus obat");
+      if (!response.ok) {
+        const data = await response.json();
+        alert(data.message || "Gagal menghapus obat");
+        return;
+      }
 
       console.log("Obat berhasil dihapus");
       refreshData();
