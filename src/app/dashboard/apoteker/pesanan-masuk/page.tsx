@@ -217,7 +217,7 @@ export default function PesananMasukPage() {
                               : pesanan.detail_obat || [],
                         });
                       }}
-                      className="p-3 rounded-xl cursor-pointer bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
+                      className="p-3 rounded-xl cursor-pointer bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-900 transition-colors"
                       title="Lihat Detail Pesanan"
                     >
                       <LuEye size={20} />
