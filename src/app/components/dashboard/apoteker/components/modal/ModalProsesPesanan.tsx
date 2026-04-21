@@ -35,6 +35,7 @@ export default function ModalProsesPesanan({
   } = useProsesPesanan();
 
   const handleSave = () => {
+    if (!window.confirm("Apakah Anda yakin ingin menyelesaikan pesanan ini?")) return;
     onSave(getPayload());
   };
 

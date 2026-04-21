@@ -226,9 +226,10 @@ export default function PesananMasukPage() {
                     {activeTab === "Menunggu Konfirmasi" && (
                       <>
                         <button
-                          onClick={() =>
-                            handleUpdateStatus(pesanan.id, "Diproses")
-                          }
+                          onClick={() => {
+                            if (window.confirm("Apakah Anda yakin ingin mengkonfirmasi pesanan ini?"))
+                              handleUpdateStatus(pesanan.id, "Diproses");
+                          }}
                           className="p-3 cursor-pointer rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
                           title="Terima Pesanan"
                         >
